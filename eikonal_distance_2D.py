@@ -100,52 +100,44 @@ class EikonalSolver:
             self.Sweep3()
             self.Sweep4()
 
-    def SweepUntilConvergence(self, epsilon = 1e-3):
+    def SweepUntilConvergence(self, epsilon = 1e-3, verbose = False):
         """Runs sweeps one by one, checking for convergence within an epsilon
         threshold at each step, using the L-infinity norm"""
+        k = 0
         while True:
             prev = self.grids_after_sweeps[-1].copy()
 
             self.Sweep1()
+            k += 1
             if np.max(np.abs(self.grids_after_sweeps[-1]-prev)) < epsilon:
                 break
             prev = self.grids_after_sweeps[-1].copy()
 
             self.Sweep2()
+            k += 1
             if np.max(np.abs(self.grids_after_sweeps[-1] - prev)) < epsilon:
                 break
             prev = self.grids_after_sweeps[-1].copy()
 
             self.Sweep3()
+            k += 1
             if np.max(np.abs(self.grids_after_sweeps[-1] - prev)) < epsilon:
                 break
             prev = self.grids_after_sweeps[-1].copy()
 
             self.Sweep4()
+            k += 1
             if np.max(np.abs(self.grids_after_sweeps[-1] - prev)) < epsilon:
                 break
             prev = self.grids_after_sweeps[-1].copy()
 
+        if verbose:
+            print(f'Convergence after {k} iterations')
 
 
 
 
-#BUILDING THE COMPUTATIONAL DOMAIN
-test = ComputationalDomain(N=7, a=1, b=7, c=1, d=7)
-test.Gamma([(1, 1), (5, 4)])
-print(test.grid)
-print(test.h)
 
-#SOLVING ON THE DOMAIN
-solver = EikonalSolver(test)
-solver.BatchSweeps(k=2)
-print("AFTER SWEEP 1 : \n", solver.grids_after_sweeps[1])
-print("AFTER SWEEP 2 : \n", solver.grids_after_sweeps[2])
-print("AFTER SWEEP 3 : \n", solver.grids_after_sweeps[7])
-print("AFTER SWEEP 4 : \n", solver.grids_after_sweeps[8])
-print(len(solver.grids_after_sweeps))
-#plt.imshow(solver.grids_after_sweeps[4])
-#plt.show()
 
 
 

@@ -8,20 +8,22 @@ import scienceplots
 plt.style.use(['science', 'grid'])
 
 errors = []
+epsilon = 1e-4
 
-for N in [(20*i+1) for i in range(1,5)]:
+for N in [(20*i + 1) for i in range(1, 5)]:
     print("Running convergence analysis. N = ", N)
     unit_square = ComputationalDomain(N = N, a = -1, b = 1, c = -1, d = 1)
     unit_square.Gamma([(int((N-1)/2), int((N-1)/2))])
 
     solver = EikonalSolver(unit_square)
-    solver.SweepUntilConvergence(epsilon = 1e-4)
+    solver.SweepUntilConvergence(epsilon = epsilon)
     numerical_solution = solver.grids_after_sweeps[-1]
 
     x = np.linspace(-1, 1, N)
     y = np.linspace(-1, 1, N)
     X, Y = np.meshgrid(x, y)
     true_distance = np.sqrt(X**2 + Y**2)
+
 
     max_error = np.max(np.abs(true_distance - numerical_solution))
     errors.append(max_error)
@@ -30,12 +32,13 @@ for N in [(20*i+1) for i in range(1,5)]:
 
 
 plt.figure(figsize=(6.5, 4))
-plt.plot([(25*i +1) for i in range(1,5)], errors, marker='x', label=r'$L^\infty$ Error')
+plt.plot([(20*i + 1) for i in range(1,5)], errors,  marker='x', label=r'$L^{\infty}$ Error')
 plt.xlabel("Grid size (N)")
 plt.ylabel("Max Error")
 plt.yscale("log")
-plt.title("Convergence of Eikonal Solver")
+plt.title(r'Convergence of Eikonal Solver for distance function on $[0,1]^2$, $\epsilon = 10^{-4}$')
 plt.legend()
 plt.tight_layout()
+plt.savefig('plots/convergence2d.png')
 plt.show(block=True)  # Keep the window open
 
