@@ -16,12 +16,12 @@ class EikonalSolver:
         self.F = F #Velocity on the domain
 
     def update_point_with_F(self, current_grid, new_grid, i, j):
-        f_ij = 1/F(self.domain.a + j*self.domain.h, self.domain.d - i*self.domain.h) #converting from numpy coordinates to cartesian
+        f_ij = 1/self.F(self.domain.a + j*self.domain.h, self.domain.d - i*self.domain.h) #converting from numpy coordinates to cartesian
         N = self.domain.N
         u_old = current_grid[i, j]
 
-        if u_old == 1:
-            return # no update needed for points in Gamma
+        if (i, j) in self.domain.frozen:  # meaning we're encountering a point in the BC Gamma
+            return
 
         u_xmin = np.min([new_grid[i, j - 1] if j > 0 else np.inf,
                          new_grid[i, j + 1] if j < N - 1 else np.inf])
@@ -102,29 +102,40 @@ class EikonalSolver:
             self.Sweep3()
             self.Sweep4()
 
+    def SweepUntilConvergence(self, epsilon = 1e-3, verbose = False):
+        """Runs sweeps one by one, checking for convergence within an epsilon
+        threshold at each step, using the L-infinity norm"""
+        k = 0
+        while True:
+            prev = self.grids_after_sweeps[-1].copy()
 
-def F(x,y):
-    return (1+0.5*(x**2+y**2))
+            self.Sweep1()
+            k += 1
+            if np.max(np.abs(self.grids_after_sweeps[-1] - prev)) < epsilon:
+                break
+            prev = self.grids_after_sweeps[-1].copy()
 
-test = ComputationalDomain(N=601, a=-1, b=1, c=-1, d=1)
-test.Gamma([(300, 300)])
-print(test.grid)
-print(test.h)
+            self.Sweep2()
+            k += 1
+            if np.max(np.abs(self.grids_after_sweeps[-1] - prev)) < epsilon:
+                break
+            prev = self.grids_after_sweeps[-1].copy()
 
-solver = EikonalSolver(test, F)
-solver.BatchSweeps(k=5)
-print("AFTER SWEEP 1 : \n", solver.grids_after_sweeps[1])
-print("AFTER SWEEP 2 : \n", solver.grids_after_sweeps[2])
-print("AFTER SWEEP 3 : \n", solver.grids_after_sweeps[7])
-print("AFTER SWEEP 4 : \n", solver.grids_after_sweeps[8])
-#print(len(solver.grids_after_sweeps))
-#plt.imshow(solver.grids_after_sweeps[4])
-#print(solver.grids_after_sweeps[4][6,0])
-#plt.show()
+            self.Sweep3()
+            k += 1
+            if np.max(np.abs(self.grids_after_sweeps[-1] - prev)) < epsilon:
+                break
+            prev = self.grids_after_sweeps[-1].copy()
 
-print("Exact value in the corner : ", np.sqrt(2)*np.arctan(1))
-print("check : grid after sweep at gamma : ", solver.grids_after_sweeps[-1][150,150])
-print("value in the corner after 3 sweeps : ", solver.grids_after_sweeps[-1][0,0])
+            self.Sweep4()
+            k += 1
+            if np.max(np.abs(self.grids_after_sweeps[-1] - prev)) < epsilon:
+                break
+            prev = self.grids_after_sweeps[-1].copy()
+
+        if verbose:
+            print(f'Convergence after {k} iterations')
+
 
 
 

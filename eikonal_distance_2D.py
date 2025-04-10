@@ -17,7 +17,7 @@ class EikonalSolver:
         N = self.domain.N
         u_old = current_grid[i, j]
 
-        if u_old == 0:
+        if u_old == 0: #FOR DISTANCE ONLY : WE HAVE HARDCODED THIS VALUE TO BE 0 (IN GAMMA)
             return # no update needed for points in Gamma
 
         u_xmin = np.min([new_grid[i, j - 1] if j > 0 else np.inf,
@@ -109,7 +109,7 @@ class EikonalSolver:
 
             self.Sweep1()
             k += 1
-            if np.max(np.abs(self.grids_after_sweeps[-1]-prev)) < epsilon:
+            if np.max(np.abs(self.grids_after_sweeps[-1] - prev)) < epsilon:
                 break
             prev = self.grids_after_sweeps[-1].copy()
 

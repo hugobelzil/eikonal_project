@@ -11,10 +11,12 @@ class ComputationalDomain:
         self.b = b
         self.c = c
         self.d = d
+        self.frozen = []
 
-    def Gamma(self,stencils):
+    def Gamma(self, stencils):
         if type(stencils) != list:
             raise Exception("List of coordinates for Gamma points (side-conditions) must be of type List")
 
         for point in stencils:
             self.grid[point]= int(0)
+            self.frozen.append(point)
