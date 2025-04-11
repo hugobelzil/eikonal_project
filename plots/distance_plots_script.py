@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import scienceplots
 import numpy as np
+from sklearn.linear_model import LinearRegression
 
 grid = np.load('../results/distance/2D_distance_grid.npy')
 errors = np.load('../results/distance/2D_distance_errors.npy')
@@ -19,10 +20,21 @@ plt.tight_layout()
 plt.savefig('convergence2d.png', dpi=600, bbox_inches='tight')
 #plt.show(block=True)  # Keep the window open
 
-# Convergence plot for error vs. step size h
-plt.style.use(['science', 'grid'])
+# CONVERGENCE PLOT OF ERROR VERSUS STEP SIZE h
+
+#Start with the linear model
+model = LinearRegression()
+X = np.array([(2/(N-1)) for N in index]).reshape(-1,1)
+model.fit(np.abs(X*np.log(X)), errors)
+A = float(model.coef_)
+B = float(model.intercept_)
+x = np.linspace(np.min(X),np.max(X), 150)
+
+
+# Plot
 plt.figure(figsize=(7.8, 4.8))
 plt.plot([(2/(N-1)) for N in index][::-1], np.flip(errors),  marker='x', label=r'$L^{\infty}$ Error')
+plt.plot(x, A*np.abs(x*np.log(x)) + B, label = fr'${round(A,4)} \cdot |h \log h| + {round(B,4)}$')
 plt.xlabel(r'Step size $h$')
 plt.ylabel("Max Error")
 plt.yscale("log")
