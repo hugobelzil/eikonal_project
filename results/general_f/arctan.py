@@ -2,15 +2,35 @@ import numpy as np
 from eikonal_general_F_2D import EikonalSolver
 from computational_domain import ComputationalDomain
 
-test = ComputationalDomain(N=601, a=-1, b=1, c=-1, d=1)
-test.Gamma([(300, 300)])
 
+# The velocity with gives solution u(x,y) = sqrt2*atan(sqrt(x**2+y**2)/srqt2)
 def F(x, y):
     return 1 + 0.5*(x**2 + y**2)
 
+A = 21
+epsilon = 1e-6
+errors = []
 
-solver = EikonalSolver(test, F)
-solver.SweepUntilConvergence(epsilon = 1e-5, verbose = True)
-print("Exact value in the top left corner : ", np.sqrt(2)*np.arctan(1))
-print("check : top left corner value sweep at gamma : ", solver.grids_after_sweeps[-1][0,0])
-np.save('arctan_grid.npy', solver.grids_after_sweeps[-1])
+for N in [(20*i + 1) for i in range(1, A)]:
+    print("Running convergence analysis. N = ", N)
+    unit_square = ComputationalDomain(N = N, a = -1, b = 1, c = -1, d = 1)
+    unit_square.Gamma([(int((N-1)/2), int((N-1)/2))])
+
+    solver = EikonalSolver(unit_square, F = F)
+    solver.SweepUntilConvergence(epsilon = epsilon)
+    numerical_solution = solver.grids_after_sweeps[-1]
+
+    x = np.linspace(-1, 1, N)
+    y = np.linspace(-1, 1, N)
+    X, Y = np.meshgrid(x, y)
+    true_solution = np.sqrt(2)*np.arctan(np.sqrt(X**2 + Y**2)/np.sqrt(2))
+
+
+    max_error = np.max(np.abs(true_solution - numerical_solution))
+    errors.append(max_error)
+    print("N = ", N, " max error : ", max_error)
+
+print("Convergence analysis finished. Saving results.")
+np.save('2D_arctan_errors.npy', errors)
+np.save('N_index_errors_arctan.npy', [(20*i + 1) for i in range(1,A)])
+np.save('grid_atan_N401.npy',solver.grids_after_sweeps[-1])

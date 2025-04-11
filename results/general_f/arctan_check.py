@@ -3,7 +3,7 @@ import numpy as np
 
 temp = np.load("arctan_grid.npy")
 plt.imshow(temp)
-plt.title('numeerical solution')
+plt.title('numerical solution')
 plt.colorbar()
 plt.show()
 
