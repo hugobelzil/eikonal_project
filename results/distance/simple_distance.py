@@ -1,5 +1,5 @@
 import numpy as np
-from eikonal_distance_2D import EikonalSolver
+from solvers.eikonal_distance_2D import EikonalSolver
 from computational_domain import ComputationalDomain
 
 # BUILDING THE UNIT SQUARE

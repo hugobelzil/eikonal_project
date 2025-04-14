@@ -1,9 +1,8 @@
 import numpy as np
-from win32cryptcon import szOID_CERTSRV_CA_VERSION
 
-from eikonal_general_F_2D import EikonalSolver
+from solvers.eikonal_general_F_2D import EikonalSolver
 from computational_domain import ComputationalDomain
-import matplotlib.pyplot as plt
+
 
 ## BUILDING THE VELOCITY FUNCTION
 def F(x,y):

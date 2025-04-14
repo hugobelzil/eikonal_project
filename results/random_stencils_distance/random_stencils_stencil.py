@@ -1,7 +1,7 @@
 import numpy as np
 from computational_domain import ComputationalDomain
-from eikonal_distance_2D import EikonalSolver
-import matplotlib.pyplot as plt
+from solvers.eikonal_distance_2D import EikonalSolver
+
 np.random.seed(42)
 
 N = 301 # for grid size

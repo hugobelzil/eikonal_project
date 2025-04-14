@@ -1,6 +1,6 @@
 import numpy as np
 from computational_domain import ComputationalDomain
-from eikonal_general_F_2D import EikonalSolver
+from solvers.eikonal_general_F_2D import EikonalSolver
 
 def F(x,y):
     return 1/np.sqrt((np.cos(x)**2)*(np.cos(y)**2)+(np.sin(x)**2)*(np.sin(y)**2))
