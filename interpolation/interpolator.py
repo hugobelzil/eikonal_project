@@ -10,13 +10,13 @@ def bilinear_gradient(u, x, y, domain):
     i = int((y_max - y) / h)
 
     if not (0 <= i < N-1 and 0 <= j < N-1):
-        return np.array([0.0, 0.0])  # or raise exception
+        return np.array([0.0, 0.0]) #out of the domain
 
     x1 = x_min + j*h
     y1 = y_max - i*h
 
-    tx = (x - x1) / h
-    ty = (y1 - y) / h
+    tx = (x - x1)/h
+    ty = (y1 - y)/h
 
     u11 = u[i+1, j]
     u21 = u[i+1, j+1]
