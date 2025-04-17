@@ -41,3 +41,6 @@ plt.legend()
 plt.tight_layout()
 plt.savefig('convergence2d_atan_step_size.png', dpi=600, bbox_inches='tight')
 plt.show(block=True)
+
+
+# CONTOUR OF THE NUMERICAL SOLUTION

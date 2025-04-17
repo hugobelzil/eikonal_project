@@ -1,8 +1,8 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-temp = np.load("arctan_grid.npy")
-plt.imshow(temp)
+solution = np.load("arctan_grid.npy")
+plt.imshow(solution)
 plt.title('numerical solution')
 plt.colorbar()
 plt.show()
@@ -16,3 +16,5 @@ plt.imshow(Z)
 plt.title("true solution")
 plt.colorbar()
 plt.show()
+
+# CONTOURS OF THE SOLUTION
