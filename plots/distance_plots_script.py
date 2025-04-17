@@ -121,3 +121,4 @@ plt.title('Heat map for $u(x,y)$ on $[-1,1]^{2}$, $N=301$, $30$ random points in
 plt.tight_layout()
 plt.savefig('heatmap_random30.png', dpi=600, bbox_inches='tight')
 plt.show()
+print("ALL PLOTS HAVE BEEN GRAPHED")
