@@ -29,9 +29,3 @@ def bilinear_gradient(u, x, y, domain):
     return np.array([ux, uy])
 
 
-test  = np.load('../results/distance/2D_distance_grid.npy')
-from computational_domain import ComputationalDomain
-n = 256
-unit_square = ComputationalDomain(N = n+1, a = -1, b = 1, c = -1, d = 1)
-
-print(bilinear_gradient(test, 0.5, 0.5, unit_square))

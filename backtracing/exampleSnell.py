@@ -4,6 +4,7 @@ from solvers.ode_solver import ODE_backtracer
 from computational_domain import ComputationalDomain
 import matplotlib.pyplot as plt
 import scienceplots
+import cProfile
 
 ## BUILDING THE VELOCITY FUNCTION
 def F(x,y):
@@ -25,6 +26,8 @@ dom.Gamma([(10,10)]) # Target when doing back tracing
 #INSTANTIATING THE SOLVER
 print("Solving Eikonal Equation on the domain...")
 solver = EikonalSolver(domain = dom, F = F)
+#cProfile.run('solver.SweepUntilConvergence()')
+
 solver.SweepUntilConvergence(epsilon = 1e-5, verbose=True)
 u = solver.grids_after_sweeps[-1]
 

@@ -1,0 +1,82 @@
+This temporary file is used to track the performance of the solver
+for optimization purposes only, using cProfile. It can be safely ignored.
+
+16/04:
+ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+        1    0.000    0.000    5.536    5.536 <string>:1(<module>)
+        1    0.002    0.002    5.536    5.536 eikonal_general_F_2D.py:105(SweepUntilConvergence)
+   250811    2.372    0.000    5.396    0.000 eikonal_general_F_2D.py:18(update_point_with_F)
+        3    0.036    0.012    1.339    0.446 eikonal_general_F_2D.py:55(Sweep1)
+   875032    0.295    0.000    0.508    0.000 eikonal_general_F_2D.py:6(ReLU)
+        3    0.035    0.012    1.336    0.445 eikonal_general_F_2D.py:65(Sweep2)
+        3    0.040    0.013    1.749    0.583 eikonal_general_F_2D.py:77(Sweep3)
+        2    0.027    0.013    1.109    0.555 eikonal_general_F_2D.py:88(Sweep4)
+   250811    0.187    0.000    0.187    0.000 exampleSnell.py:18(F)
+       11    0.000    0.000    0.000    0.000 fromnumeric.py:2687(_max_dispatcher)
+       11    0.000    0.000    0.000    0.000 fromnumeric.py:2692(max)
+   226412    0.052    0.000    0.052    0.000 fromnumeric.py:2831(_min_dispatcher)
+   226412    0.270    0.000    2.110    0.000 fromnumeric.py:2836(min)
+   226423    0.571    0.000    1.840    0.000 fromnumeric.py:71(_wrapreduction)
+   226423    0.183    0.000    0.183    0.000 fromnumeric.py:72(<dictcomp>)
+        1    0.000    0.000    5.536    5.536 {built-in method builtins.exec}
+   226412    0.187    0.000    0.187    0.000 {built-in method builtins.getattr}
+   875032    0.213    0.000    0.213    0.000 {built-in method builtins.max}
+   501600    0.166    0.000    0.166    0.000 {built-in method builtins.min}
+       11    0.000    0.000    0.000    0.000 {method 'append' of 'list' objects}
+       35    0.001    0.000    0.001    0.000 {method 'copy' of 'numpy.ndarray' objects}
+        1    0.000    0.000    0.000    0.000 {method 'disable' of '_lsprof.Profiler' objects}
+   226423    0.042    0.000    0.042    0.000 {method 'items' of 'dict' objects}
+   226423    0.857    0.000    0.857    0.000 {method 'reduce' of 'numpy.ufunc' objects}
+
+SECOND TRY :
+ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+        1    0.000    0.000    6.737    6.737 <string>:1(<module>)
+        1    0.003    0.003    6.737    6.737 eikonal_general_F_2D.py:105(SweepUntilConvergence)
+   250811    2.891    0.000    6.560    0.000 eikonal_general_F_2D.py:18(update_point_with_F)
+        3    0.049    0.016    1.788    0.596 eikonal_general_F_2D.py:55(Sweep1)
+   875032    0.372    0.000    0.645    0.000 eikonal_general_F_2D.py:6(ReLU)
+        3    0.049    0.016    1.813    0.604 eikonal_general_F_2D.py:65(Sweep2)
+        3    0.043    0.014    1.843    0.614 eikonal_general_F_2D.py:77(Sweep3)
+        2    0.031    0.016    1.288    0.644 eikonal_general_F_2D.py:88(Sweep4)
+   250811    0.229    0.000    0.229    0.000 exampleSnell.py:18(F)
+       11    0.000    0.000    0.000    0.000 fromnumeric.py:2687(_max_dispatcher)
+       11    0.000    0.000    0.001    0.000 fromnumeric.py:2692(max)
+   226412    0.063    0.000    0.063    0.000 fromnumeric.py:2831(_min_dispatcher)
+   226412    0.321    0.000    2.525    0.000 fromnumeric.py:2836(min)
+   226423    0.669    0.000    2.205    0.000 fromnumeric.py:71(_wrapreduction)
+   226423    0.219    0.000    0.219    0.000 fromnumeric.py:72(<dictcomp>)
+        1    0.000    0.000    6.737    6.737 {built-in method builtins.exec}
+   226412    0.221    0.000    0.221    0.000 {built-in method builtins.getattr}
+   875032    0.273    0.000    0.273    0.000 {built-in method builtins.max}
+   501600    0.206    0.000    0.206    0.000 {built-in method builtins.min}
+       11    0.000    0.000    0.000    0.000 {method 'append' of 'list' objects}
+       35    0.001    0.000    0.001    0.000 {method 'copy' of 'numpy.ndarray' objects}
+        1    0.000    0.000    0.000    0.000 {method 'disable' of '_lsprof.Profiler' objects}
+   226423    0.059    0.000    0.059    0.000 {method 'items' of 'dict' objects}
+   226423    1.037    0.000    1.037    0.000 {method 'reduce' of 'numpy.ufunc' objects}
+
+THIRD TRY :
+
+ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+        1    0.000    0.000    3.511    3.511 <string>:1(<module>)
+        1    0.002    0.002    3.511    3.511 eikonal_general_F_2D.py:105(SweepUntilConvergence)
+   250811    2.328    0.000    3.370    0.000 eikonal_general_F_2D.py:18(update_point_with_F)
+        3    0.038    0.013    0.967    0.322 eikonal_general_F_2D.py:55(Sweep1)
+   875032    0.358    0.000    0.625    0.000 eikonal_general_F_2D.py:6(ReLU)
+        3    0.036    0.012    0.909    0.303 eikonal_general_F_2D.py:65(Sweep2)
+        3    0.043    0.014    1.091    0.364 eikonal_general_F_2D.py:77(Sweep3)
+        2    0.021    0.010    0.541    0.271 eikonal_general_F_2D.py:88(Sweep4)
+   250811    0.183    0.000    0.183    0.000 exampleSnell.py:18(F)
+       11    0.000    0.000    0.000    0.000 fromnumeric.py:2687(_max_dispatcher)
+       11    0.000    0.000    0.001    0.000 fromnumeric.py:2692(max)
+       11    0.000    0.000    0.001    0.000 fromnumeric.py:71(_wrapreduction)
+       11    0.000    0.000    0.000    0.000 fromnumeric.py:72(<dictcomp>)
+        1    0.000    0.000    3.511    3.511 {built-in method builtins.exec}
+   875032    0.267    0.000    0.267    0.000 {built-in method builtins.max}
+   728012    0.233    0.000    0.233    0.000 {built-in method builtins.min}
+       11    0.000    0.000    0.000    0.000 {method 'append' of 'list' objects}
+       35    0.001    0.000    0.001    0.000 {method 'copy' of 'numpy.ndarray' objects}
+        1    0.000    0.000    0.000    0.000 {method 'disable' of '_lsprof.Profiler' objects}
+       11    0.000    0.000    0.000    0.000 {method 'items' of 'dict' objects}
+       11    0.001    0.000    0.001    0.000 {method 'reduce' of 'numpy.ufunc' objects}
+

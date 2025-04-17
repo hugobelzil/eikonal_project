@@ -5,7 +5,7 @@ from computational_domain import ComputationalDomain
 
 def ReLU(x):
     """Helper to update points in the scheme"""
-    return np.max([x, 0])
+    return max(0.0, x)
 
 class EikonalSolver:
     def __init__(self,domain):
@@ -20,20 +20,20 @@ class EikonalSolver:
         if u_old == 0: #FOR DISTANCE ONLY : WE HAVE HARDCODED THIS VALUE TO BE 0 (IN GAMMA)
             return # no update needed for points in Gamma
 
-        u_xmin = np.min([new_grid[i, j - 1] if j > 0 else np.inf,
+        u_xmin = min([new_grid[i, j - 1] if j > 0 else np.inf,
                          new_grid[i, j + 1] if j < N - 1 else np.inf])
-        u_ymin = np.min([new_grid[i - 1, j] if i > 0 else np.inf,
+        u_ymin = min([new_grid[i - 1, j] if i > 0 else np.inf,
                          new_grid[i + 1, j] if i < N - 1 else np.inf])
 
         # Conditions on updating u_old
 
-        if ReLU(u_old - u_xmin) == 0 and ReLU(u_old - u_ymin) != 0:
+        if max(u_old - u_xmin, 0.0) == 0.0 and max(u_old - u_ymin, 0.0) != 0.0:
             u_bar = self.domain.h + u_ymin
 
-        elif ReLU(u_old - u_ymin) == 0 and ReLU(u_old - u_xmin) != 0:
+        elif max(u_old - u_ymin, 0.0) == 0.0 and max(u_old - u_xmin, 0.0) != 0.0:
             u_bar = self.domain.h + u_xmin
 
-        elif ReLU(u_old - u_xmin) == 0 and ReLU(u_old - u_ymin) == 0:
+        elif max(u_old - u_xmin, 0.0) == 0.0 and max(u_old - u_ymin, 0.0) == 0.0:
             return  # No update needed
 
         else:
@@ -41,13 +41,13 @@ class EikonalSolver:
             b = u_ymin
 
             if np.abs(b - a) >= self.domain.h:
-                u_bar = np.min([a, b]) + self.domain.h
+                u_bar = min([a, b]) + self.domain.h
 
             else:
                 u_bar = (a + b + np.sqrt(2 * self.domain.h ** 2 - (a - b) ** 2)) / 2
 
         # UPDATE OF THE POINT
-        new_grid[i, j] = np.min([u_old, u_bar])
+        new_grid[i, j] = min([u_old, u_bar])
 
     def Sweep1(self):
         """Sweep going from bottom left corner of the domain to top-right corner"""
