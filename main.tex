@@ -287,7 +287,78 @@ For the analysis below, we discretize the square $[-1,1]^2$ evenly with $N=257 \
 \end{figure}
 
 \subsubsection{Distance function with several boundary points}
-The example in the previous subsection was only considering one boundary value at the origin of the domain, i.e. the set $\Gamma$ was simply $\Gamma=\{(0,0)\}$. We can introduce several other boundary points, and the solution $u$ picked up by the fast sweeping-method will give at any point $(x,y)$ the distance to the closest point $\gamma\in\Gamma$, as we showed in section \ref{}. Indeed consider the case below, where we sampled uniformly 30 points at random on $[-1,1]^2$, and set these points to be 0 in the domain. Hence, we now have 
+The example in the previous subsection was only considering one boundary value at the origin of the domain, i.e. the set $\Gamma$ was simply $\Gamma=\{(0,0)\}$. We can introduce several other boundary points, and the solution $u$ picked up by the fast sweeping-method will give at any point $(x,y)$ the distance to the closest point $\gamma\in\Gamma$, as we showed in section \ref{}. Indeed consider the case below, where we chose 5 points at random on $[-1,1]^2$, and set these points to be 0 in the domain. Our Eikonal solver then converges to the numerical solution $u(x,y)$ whose contours and 3D surface are given by figures x and x respectively.
+
+\vspace{5pt}
+
+\begin{figure}[h]
+  \centering
+  \begin{minipage}{0.45\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{plots/contour_plot_random5.png}
+    \caption{Contours of numerical solution ($|\Gamma|=5$)}
+    \label{fig:contour5}
+  \end{minipage}
+  \hfill
+  \begin{minipage}{0.45\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{plots/solution_3d_surface_random5.png}
+    \caption{3D surface of the solution ($|\Gamma$|=5)}
+    \label{fig:surface5}
+  \end{minipage}
+\end{figure}
+
+\vspace{5pt}
+\noindent Finally, we look at another case where we introduce several more boundary points in $\Gamma$. In the example below, we sampled uniformly at random 30 points in $[-1,1]^2$ and set these points to have value 0. A heatmap of the solution is:
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=0.5\textwidth]{plots/heatmap_random30.png}
+  \caption{Your image caption}
+  \label{fig:heatmap30random}
+\end{figure}
+\newpage
+\subsection{General Eikonal equation}
+In this subsection, we now are interested at problems of the form of \ref{original-eikonal} where $f(x,y)\not\equiv 1$ on the domain. Conveniently, we will also rewrite $f(x,y)=\frac{1}{F(x,y)}$, where $F(x,y)$ can now be thought of as a velocity over the domain. As a result, the solution $u(x,y)$ does not give the distance to the boundary anymore, but rather the "cost" of the travel from $(x,y)$ to $\Gamma$.
+We test our solver for the problem.
+
+\begin{equation}
+\label{arctan_equation}
+    \begin{cases}
+        \|\nabla u(x,y)\|_2=\frac{1}{1+0.5(x^2+y^2)} , \quad(x,y) \in [-1,1]^2 \\
+        u(0,0)= 0
+    \end{cases}
+\end{equation}
+One can easily check that $u(x,y)=\sqrt{2}\arctan\Big[\sqrt{\frac{x^2+y^2}{2}}\Big]$ solves (\ref{arctan_equation}). We use this reference to test our solver with the following parameters : $N=401$ on the discretized domain $[-1,1]^2$ which gives the step size $h=0.01$, with convergence criterion $\epsilon=10^{-6}$
+\subsubsection{Convergence}
+From Zhao, we know that for the general case $1/F(x,y)\not\equiv1$, the fast-sweeping method also converges to the true solution in $O(|h\log h|)$. For the reference problem defined in the section above, with $N\in\{21,41,\dots,401\}$, we get the following convergence to the true solution.
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.6\textwidth]{plots/convergence2d_atan_step_size.png}
+  \caption{Convergence plot}
+  \label{fig:convarctan}
+\end{figure}
+
+With $N=401$, the solution looks like:
+\begin{figure}[h]
+  \centering
+  \begin{minipage}{0.45\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{plots/contour_plot_random5.png}
+    \caption{Contours of numerical solution ($|\Gamma|=5$)}
+    \label{fig:contour5}
+  \end{minipage}
+  \hfill
+  \begin{minipage}{0.45\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{plots/solution_3d_surface_random5.png}
+    \caption{3D surface of the solution ($|\Gamma$|=5)}
+    \label{fig:surface5}
+  \end{minipage}
+\end{figure}
+
+
 \newpage
 \newpage
 \section{Path planning}
