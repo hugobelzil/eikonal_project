@@ -33,4 +33,12 @@ for N in [(20*i + 1) for i in range(1, A)]:
 print("Convergence analysis finished. Saving results.")
 np.save('2D_arctan_errors.npy', errors)
 np.save('N_index_errors_arctan.npy', [(20*i + 1) for i in range(1,A)])
-np.save('grid_atan_N401.npy',solver.grids_after_sweeps[-1])
+
+# EXAMPLE ON LARGER GRID (FOR PLOTTING PURPOSES)
+domain2 = ComputationalDomain(N = 801, a = -2, b = 2, c = -2, d = 2)
+domain2.Gamma([(400,400)])
+solver = EikonalSolver(domain2, F = F)
+print('Solving on larger grid...')
+solver.SweepUntilConvergence(epsilon = epsilon)
+np.save('grid_atan_N801.npy',solver.grids_after_sweeps[-1])
+print('DONE')

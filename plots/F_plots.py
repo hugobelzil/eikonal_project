@@ -40,7 +40,26 @@ plt.title(r'Convergence of Eikonal Solver with $F(x,y)=1+0.5(x^{2}+y^{2})$ on $[
 plt.legend()
 plt.tight_layout()
 plt.savefig('convergence2d_atan_step_size.png', dpi=600, bbox_inches='tight')
-plt.show(block=True)
+plt.show(block=False)
 
 
 # CONTOUR OF THE NUMERICAL SOLUTION
+x = np.linspace(-2, 2, 801)
+y = np.linspace(-2, 2, 801)
+
+X, Y = np.meshgrid(x, y)
+Z = np.load('../results/general_f/grid_atan_N801.npy')
+
+fig = plt.figure(figsize=(8, 6))
+ax = fig.add_subplot(111, projection='3d')
+surf = ax.plot_surface(X, Y, Z, cmap='jet', edgecolor='none')
+
+ax.set_xlabel(r'$x$')
+ax.set_ylabel(r'$y$')
+ax.set_zlabel(r'$u(x, y)$')
+ax.set_title('Numerical Solution for $F(x,y) = 1+0.5(x^2+y^2)$ on $[-2,2]^{2}$, $N=801$', fontsize = 18)
+fig.colorbar(surf, shrink=0.5, aspect=10)
+
+plt.tight_layout()
+plt.savefig('solution_3d_surface_arctan.png', dpi=600)
+plt.show(block=True)

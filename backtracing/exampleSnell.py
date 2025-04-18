@@ -19,6 +19,19 @@ def F(x,y):
     if ((x-0.5)**2)+((y-0.5)**2)<=1/10:
         return 0.2
     return 1
+
+def F(x,y):
+    '''Function defining the velocity'''
+    if x >= 0.75:
+        return 1
+    elif (x < 0.75) and (x >= 0.60):
+        return 0.5
+    elif (x < 0.60) and (x >= 0.40):
+        return 1.5
+    elif (x < 0.40) and (x >= 0.15):
+        return 0.3
+    return 1
+
 ## BUILDING THE DOMAIN
 dom = ComputationalDomain(N = 151, a = 0, b = 1, c = 0, d = 1)
 dom.Gamma([(10,10)]) # Target when doing back tracing
