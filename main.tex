@@ -317,8 +317,10 @@ The example in the previous subsection was only considering one boundary value a
   \caption{Your image caption}
   \label{fig:heatmap30random}
 \end{figure}
+
 \newpage
-\subsection{General Eikonal equation}
+
+\subsection{General Eikonal equations}
 In this subsection, we now are interested at problems of the form of \ref{original-eikonal} where $f(x,y)\not\equiv 1$ on the domain. Conveniently, we will also rewrite $f(x,y)=\frac{1}{F(x,y)}$, where $F(x,y)$ can now be thought of as a velocity over the domain. As a result, the solution $u(x,y)$ does not give the distance to the boundary anymore, but rather the "cost" of the travel from $(x,y)$ to $\Gamma$.
 We test our solver for the problem.
 
@@ -340,7 +342,9 @@ From Zhao, we know that for the general case $1/F(x,y)\not\equiv1$, the fast-swe
   \label{fig:convarctan}
 \end{figure}
 
-With $N=401$, the solution looks like:
+\vspace{10pt}
+
+\noindent With $N=401$, the solution looks like the following:
 \begin{figure}[h]
   \centering
   \begin{minipage}{0.45\textwidth}
