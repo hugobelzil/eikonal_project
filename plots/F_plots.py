@@ -43,7 +43,8 @@ plt.savefig('convergence2d_atan_step_size.png', dpi=600, bbox_inches='tight')
 plt.show(block=False)
 
 
-# CONTOUR OF THE NUMERICAL SOLUTION
+# 3D SURFACE OF THE NUMERICAL SOLUTION
+
 x = np.linspace(-2, 2, 801)
 y = np.linspace(-2, 2, 801)
 
@@ -63,3 +64,14 @@ fig.colorbar(surf, shrink=0.5, aspect=10)
 plt.tight_layout()
 plt.savefig('solution_3d_surface_arctan.png', dpi=600)
 plt.show(block=True)
+
+# CONTOURS OF THE SOLUTION
+plt.figure(figsize=(8, 6))
+contour = plt.contour(X, Y, Z, levels = 15, cmap = 'jet')
+plt.colorbar(contour)
+plt.xlabel(r'$x$')
+plt.ylabel(r'$y$')
+plt.title('Contours of the numerical solution over the square $[-2,2]^{2}$', fontsize = 18, pad  = 20)
+plt.tight_layout()
+plt.savefig('contour_plot_arctan.png', dpi=600, bbox_inches='tight')
+plt.show()
