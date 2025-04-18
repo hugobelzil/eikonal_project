@@ -15,6 +15,7 @@
 \usepackage{microtype}                     % Better spacing, text aesthetics
 \usepackage{tikz}
 
+
 \usepackage{mathspec}
 \defaultfontfeatures{Mapping=tex-text}
 \usepackage{fontspec}
@@ -349,40 +350,64 @@ From Zhao, we know that for the general case $1/F(x,y)\not\equiv1$, the fast-swe
   \centering
   \begin{minipage}{0.45\textwidth}
     \centering
-    \includegraphics[width=\linewidth]{plots/contour_plot_random5.png}
-    \caption{Contours of numerical solution ($|\Gamma|=5$)}
-    \label{fig:contour5}
+    \includegraphics[width=\linewidth]{plots/contour_plot_arctan.png}
+    \caption{Contours of numerical solution where $F(x,y)=1+0.5(x^2+y^2)$}
+    \label{fig:contour_arctan}
   \end{minipage}
   \hfill
   \begin{minipage}{0.45\textwidth}
     \centering
-    \includegraphics[width=\linewidth]{plots/solution_3d_surface_random5.png}
-    \caption{3D surface of the solution ($|\Gamma$|=5)}
-    \label{fig:surface5}
+    \includegraphics[width=\linewidth]{plots/solution_3d_surface_arctan.png}
+    \caption{3D surface of the numerical solution}
+    \label{fig:surface_arctan}
   \end{minipage}
 \end{figure}
 
 
 \newpage
-\newpage
-\section{Path planning}
-In this section, we solve the following differential equation numerically in order to compute the shortest path.
+
+\section{An application : Path planning}
+In this section, we make use of the fast-sweeping method discussed to bridge our solutions with another problem : path planning. Our goal is to compute an optimal path over a domain $\Omega\subset\R^2$, starting at a point $X_0\in \R^2$ to a target set $\Gamma$. \\
+In particular, one can show in optimal control theory that given the Eikonal equation set-up that we described above where $F(x,y)$ is the positive function defining the "velocity" inside, say a medium, then the shortest path in time $\textbf{X}(t)\subset \R^2$ that goes from $X_0$ to $\Gamma$ must satisfy the following diffential equation:
 \begin{equation}
+\label{general_form_optimal_path_DE}
     \frac{d\textbf{X}(t)}{dt}=-\nabla u(\textbf{X}(t))
 \end{equation}
-which ultimately leads us to the iteration 
+
+\noindent where $u$ is the solution to the Eikonal equation (\ref{original-eikonal}). In 2D, equation (\ref{general_form_optimal_path_DE}) can be rewritten as : 
+
 \begin{equation}
-    \textbf{X}_{k+1}=\textbf{X}_k-\Delta t \nabla \psi(\textbf{X}_k)
+\label{optimal_path_DE_2D}
+    \begin{bmatrix}
+        \dot{x_1}(t) \\
+        \dot{x_2}(t)
+    \end{bmatrix} = \begin{bmatrix}
+        -\partial_xu(x_1(t),x_2(t)) \\
+        -\partial_yu(x_1(t),x_2(t))
+    \end{bmatrix}
 \end{equation}
 
-THINGS TO ADD :
-\begin{itemize}
-    \item 2D distance : convergence plot, picture of the cone on the unit square, contour plots.
-    \item 2D distance : random gamma : contour, heatmaps, 3d plot of the solution (argue on the discontinuities)
-    \item 2D General F : equation that satisfies the PDE : compare with my solution (show number of iterations), 3d plots, contours
-    \item 
-    \item 
-\end{itemize}
-\end{document}
+\noindent Several points need to be taken care of. First, observe that (\ref{optimal_path_DE_2D}) a time-continuous problem, while the solution $u$ obtained with the fast-sweeping method is discretized over a mesh with stepsize $h$. Therefore, we will need to be able to interpolate $\nabla u$ inside cells of a mesh grid. For this, we will use bilinear interpolation.
+\\
+Secondly, we will discretize \ref{optimal_path_DE_2D} forward in time using time-increments $\Delta t$ 
+
+\subsection{Bilinear interpolation}
+
+\subsection{Discretization of the ODE}
+As discussed above, we approach the differential equation \ref{optimal_path_DE_2D} using a forward-in-time Euler discretization.Let $x_i^{n}=x_i(n\Delta t), i=1,2$. The scheme is:
+\begin{equation}
+    \begin{cases}
+        \frac{x_1^{n+1}-x_1^n}{\Delta t}=-\Tilde{u_x}(x_1^n,x_2^n) \\
+        \frac{x_2^{n+1}-x_2^n}{\Delta t}=-\Tilde{u_y}(x_1^n,x_2^n)
+    \end{cases} \implies
+    \begin{cases}
+        x_1^{n+1} = x_1^n-\Delta t\Tilde{u_x}(x_1^n,x_2^n) \\
+        x_2^{n+1} = x_2^n-\Delta t\Tilde{u_y}(x_1^n,x_2^n)
+    \end{cases}
+\end{equation}
+
+\noindent which we recognize as being a gradient descent, stopping when $[x_1^n,x_2^n]^T\in \Gamma$, and where $\Tilde{u_x}$ and $\Tilde{u_y}$ are the interpolated first derivaties of the numerical solution $u$
 
 \end{document}
+
+
