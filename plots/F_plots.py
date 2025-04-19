@@ -25,6 +25,7 @@ plt.show(block=True)  # Keep the window open
 model = LinearRegression()
 X = np.array([(2/(N-1)) for N in index]).reshape(-1,1)
 model.fit(np.abs(X*np.log(X)), errors_atan)
+#model.fit(np.sqrt(X), errors_atan)
 A = float(model.coef_)
 B = float(model.intercept_)
 
@@ -33,6 +34,8 @@ plt.style.use(['science', 'grid'])
 plt.figure(figsize=(7.8, 4.8))
 plt.plot([(2/(N-1)) for N in index][::-1], np.flip(errors_atan),  marker='x', label=r'$L^{\infty}$ Error')
 plt.plot(x, A*np.abs(x*np.log(x)) + B, label = fr'${round(A,4)} \cdot |h \log h| + {round(B,4)}$')
+#plt.plot(x, A*np.sqrt(x) + B, label = fr'${round(A,4)} \cdot \sqrt h + {round(B,4)}$')
+
 plt.xlabel(r'Step size $h$')
 plt.ylabel("Max Error")
 plt.yscale("log")

@@ -23,14 +23,28 @@ for N in [(20*i + 1) for i in range(2,16)]:
     y = np.linspace(-1, 1, N)
     X, Y = np.meshgrid(x, y)
     true_distance = np.sqrt(X ** 2 + Y ** 2)
+    true_l2_norm = np.sqrt(8/3)
+
+    l2_norm_4sweeps = np.sum(solution_4sweeps**2)*((domain.h)**2)
+    l2_norm_4sweeps = np.sqrt(l2_norm_4sweeps)
+
+    l2_norm_epsilon = np.sum(solution_epsilon ** 2)*((domain.h)**2)
+    l2_norm_epsilon = np.sqrt(l2_norm_epsilon)
 
     max_error_4sweeps = np.max(np.abs(true_distance - solution_4sweeps))
     max_error_epsilon = np.max(np.abs(true_distance - solution_epsilon))
-    print('error 4 sweeps : ', max_error_4sweeps)
-    print('error epsilon : ', max_error_epsilon)
 
-    errors_epsilon.append(max_error_epsilon)
-    errors_4sweeps.append(max_error_4sweeps)
+    l2_error_4sweeps = np.abs(l2_norm_4sweeps - true_l2_norm)
+    l2_error_epsilon = np.abs(l2_norm_epsilon - true_l2_norm)
+    #print('error 4 sweeps : ', max_error_4sweeps)
+    #print('error epsilon : ', max_error_epsilon)
+    print('True L2 NORM : ', true_l2_norm)
+    print('L2 norm for epsilon : ', l2_norm_epsilon)
+    print('L2 norm for 4 sweeps : ', l2_norm_4sweeps)
+    #errors_epsilon.append(max_error_epsilon)
+    #errors_4sweeps.append(max_error_4sweeps)
+    errors_epsilon.append(l2_error_epsilon)
+    errors_4sweeps.append(l2_error_4sweeps)
 
 
 

@@ -38,7 +38,7 @@ plt.plot(x, A*np.abs(x*np.log(x)) + B, label = fr'${round(A,4)} \cdot |h \log h|
 plt.xlabel(r'Step size $h$')
 plt.ylabel("Max Error")
 plt.yscale("log")
-plt.title(r'Convergence of Eikonal Solver for distance function on $[-1,1]^2$, $\epsilon = 10^{-6}$')
+plt.title(r'Convergence of Eikonal Solver for distance function on $[-1,1]^2$')
 plt.legend()
 plt.tight_layout()
 plt.savefig('convergence2d_step_size.png', dpi=600, bbox_inches='tight')
