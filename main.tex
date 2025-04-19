@@ -14,7 +14,10 @@
 \usepackage{mathtools}                     % Extra math goodies
 \usepackage{microtype}                     % Better spacing, text aesthetics
 \usepackage{tikz}
-
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\usepgfplotslibrary{patchplots}
+\usetikzlibrary{3d}
 
 \usepackage{mathspec}
 \defaultfontfeatures{Mapping=tex-text}
@@ -150,6 +153,8 @@ where $\|\cdot\|_2$ denotes the Euclidean norm in $\R^n$, and $u,f,\phi:\R^n\xri
 
 \section{Theory}
 %Introduce the equation and give some details
+\subsection{Origins and derivation}
+
 \subsection{2D Distance function}
 An important application of Eikonal functions is the computation of Euclidean distances in $\R^n$. In particular, let us consider the following problem : suppose that we are given a  finite set of points $\Gamma = \{\gamma^{(1)},\dots,\gamma^{(m)}\}$, and for each $\textbf{x}=(x,y)$ in our computational domain, we would like to compute the shortest distance to $\Gamma$. Hence, we would like to have a function $d(x,y)$ such that
 \begin{equation}
@@ -392,6 +397,61 @@ In particular, one can show in optimal control theory that given the Eikonal equ
 Secondly, we will discretize \ref{optimal_path_DE_2D} forward in time using time-increments $\Delta t$ 
 
 \subsection{Bilinear interpolation}
+Since our numerical solutions $u$ to Eikonal equations are available over a finite grid after using the Fast-Sweeping method, we need to be able to interpolate the values of the gradient of $u$ for points that do not lie in the grid, i.e. points that lie inside cells of the grid. For this, we use bilinear interpolation.
+
+
+\begin{tikzpicture}
+  \begin{axis}[
+    title={3D Plot of Bilinear Interpolation},
+    xlabel={$x$},
+    ylabel={$y$},
+    zlabel={$z$},
+    grid=major,
+    view={50}{25},
+  ]
+    % Define corner points
+    \addplot3[
+      color=blue,
+      mark=*]
+      coordinates {
+        (0, 0, 0.3) (1, 0, 0.7) (1, 1, 1) (0, 1, 0.5)
+      };
+
+    % Add connecting lines
+    \addplot3[
+      color=red,
+      mark=none,
+      line width=0.5pt]
+      coordinates {
+        (0,0,0.3) (1,0,0.7)
+      };
+    \addplot3[
+      color=red,
+      mark=none,
+      line width=0.5pt]
+      coordinates {
+        (1,0,0.7) (1,1,1)
+      };
+    \addplot3[
+      color=red,
+      mark=none,
+      line width=0.5pt]
+      coordinates {
+        (1,1,1) (0,1,0.5)
+      };
+    \addplot3[
+      color=red,
+      mark=none,
+      line width=0.5pt]
+      coordinates {
+        (0,1,0.5) (0,0,0.3)
+      };
+  \end{axis}
+\end{tikzpicture}
+
+
+
+
 
 \subsection{Discretization of the ODE}
 As discussed above, we approach the differential equation \ref{optimal_path_DE_2D} using a forward-in-time Euler discretization.Let $x_i^{n}=x_i(n\Delta t), i=1,2$. The scheme is:
