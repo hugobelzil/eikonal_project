@@ -41,3 +41,4 @@ for j in range(2,11):
     l.append(float(1/j))
 
 for f in l:
+git 
