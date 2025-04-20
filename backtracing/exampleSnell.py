@@ -29,21 +29,19 @@ u = solver.grids_after_sweeps[-1]
 np.save('snell_grid.npy',solver.grids_after_sweeps[-1])
 # FINDING THE OPTIMAL PATH
 x0 = [0,-0.5]
-path = ODE_backtracer(x0 =x0,domain = dom, dt = dom.h/2, u_grid = u, tol = 1e-8, max_steps=150000)
+path = ODE_backtracer(x0 =x0,domain = dom, dt = dom.h/10, u_grid = u, tol = 1e-8, max_steps=150000)
 print("First point of the path (cart. coords.) : ", path[0])
 print("Last point of the path (cart. coords.) : ", path[-1])
 
 
-target = np.array([dom.a + 10*dom.h, dom.d - 10*dom.h])
 print("Starting point in (x,y) : ",x0)
-print("Target in (x,y) : ", target)
+
 
 plt.style.use(['science', 'grid'])
 plt.figure(figsize=(7.8, 4.8))
 plt.imshow(u, origin = "upper", extent=(dom.a, dom.b, dom.c, dom.d), cmap='jet')
 plt.colorbar()
 plt.plot(path[:,0], path[:,1], color='black', linewidth=1, label='Path')
-plt.scatter(*target, color='red', s=30, label=r'$\Gamma$')
 plt.scatter(*x0, color='blue', s = 30, label=r'$x_0$')
 plt.legend()
 plt.title(r"Optimal path backtraced solving $\partial_t X = -\nabla u(X)$", fontsize=18, pad = 10)
