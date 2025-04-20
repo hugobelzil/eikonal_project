@@ -137,11 +137,11 @@ The Eikonal equations have several applications across many fields of mathematic
 \begin{equation}
 \label{original-eikonal}
     \begin{cases}
-        \|\nabla u(\textbf{x})\|_2=f(\textbf{x}) , \quad\textbf{x} \in\R^n\\
+        |\nabla u(\textbf{x})|=f(\textbf{x}) , \quad\textbf{x} \in\R^n\\
         u(\textbf{x})=\phi(\textbf{x}),\quad \textbf{x} \in \Gamma \subset \R^n
     \end{cases}
 \end{equation}
-where $\|\cdot\|_2$ denotes the Euclidean norm in $\R^n$, and $u,f,\phi:\R^n\xrightarrow{}\R$. Alternatively, we can rewrite \eqref{original-eikonal} as 
+where $|\cdot|$ denotes the Euclidean norm in $\R^n$, and $u,f,\phi:\R^n\xrightarrow{}\R$. Alternatively, we can rewrite \eqref{original-eikonal} as 
 \begin{equation}
     \begin{cases}
         \sum_{i=1}^{n}\big(\frac{\partial u}{\partial x_i}\big)^2=f^2(\textbf{x}) , \quad\textbf{x} \in\R^n\\
@@ -154,8 +154,29 @@ where $\|\cdot\|_2$ denotes the Euclidean norm in $\R^n$, and $u,f,\phi:\R^n\xri
 \section{Theory}
 %Introduce the equation and give some details
 \subsection{Origins and derivation}
+Eikonal equations are common equations, encountered in several fields of the sciences. They first arose in geometric optics problems on the propagation of light waves, the term \textit{eikonal} being a germanization of the greek word \textit{eikon}, meaning "image" or "icon". Wikipedia \ref{} We will see in section \ref{} an example where it applies to the refraction of light in changing media.
+\vspace{10pt}
+These equations however arise in several other fields, including optimal control theory and robotics. The solutions of eikonal equations can be used to compute optimal paths in time, as we will see in section \ref{}.
+\vspace{10pt}
+In particular, the differential equation (\ref{original-eikonal}) can be derived from level-set equations, for the propagation of a front for example. If we let the 0-level set of a function $\phi(\vec{x},t)$ represent a curve or a surface moving in space (being a front), we need the function $\phi$ to satisfy the advection equation: \\
+\begin{equation}
+\label{level_set_equation}
+    \phi_t+F(\vec{x})|\nabla \phi| =0
+\end{equation} \\
+where $F:\vec{x}\rightarrow\R$ represents the velocity at which the point $\vec{x}$ on the curve (or surface) moves. If we restrict $F$ to be strictly positive, we force the curve to move "outwards" and extend in space. This assumption allows us the make the ansatz that $\phi$ can be expressed as : $\phi(\vec{x},t)=\psi(\vec{x})-t$. The reason for this is the following : this rewriting allows us to think of $\psi(\vec{x})$ as the arrival time of the front (the curve) to the point $\vec{x}$ in space. Indeed, recall that the curve is described as the 0-level set of $\phi(\vec{x},t)$. We can now plug-in this ansatz into (\ref{level_set_equation}) and get: \\
+\begin{align*}
+    & (\psi(\vec{x})-t)_t+F|\nabla(\psi(\vec{x})-t)|=0 \\
+    &\implies-1 +F|\nabla\psi| = 0 \\
+    &\implies |\nabla\psi|=\frac{1}{F}
+\end{align*} \\
+\noindent which indeed gives an Eikonal equation. In the front-propagation context, we can hence interpret the solution as the following : the arrival times $\psi$ in space of a front starting at a point $\gamma$ and propagating in a medium with speed $F$ must solve the eikonal equation
+\begin{equation*}
+    |\nabla\psi(\textbf{x})|=\frac{1}{F(\textbf{x})}, \quad \psi(\gamma)=0
+\end{equation*}
+When $F\equiv1$, the front is moving through a uniform media, at the same speed everywhere. Hence, we can view $\psi$ as the distance to $\gamma$ (see section \ref{section_on_distance}). In the analysis above, we let $\gamma$ be a single point in space, but the front could also originate from a curve, or several points in space, as we will see below. In this case, we have now a set of boundary conditions $\Gamma$.
 
-\subsection{2D Distance function}
+\subsection{Distance function in 2D}
+\label{section_on_distance}
 An important application of Eikonal functions is the computation of Euclidean distances in $\R^n$. In particular, let us consider the following problem : suppose that we are given a  finite set of points $\Gamma = \{\gamma^{(1)},\dots,\gamma^{(m)}\}$, and for each $\textbf{x}=(x,y)$ in our computational domain, we would like to compute the shortest distance to $\Gamma$. Hence, we would like to have a function $d(x,y)$ such that
 \begin{equation}
 \label{min-problem}
@@ -169,6 +190,10 @@ Consider this problem in $\R^2$, if we let $(x,y)$ such that its closest point i
     \implies \|\nabla d(x,y)\|^{2}_{2} = \Bigg(\frac{\partial d}{\partial x}\Bigg)^2 + \Bigg(\frac{\partial d}{\partial y}\Bigg)^2=1
 \end{gather*}
 Indeed, $d(x,y)$ solves the Eikonal equation where $f(x,y) \equiv 1$, and naturally we have $d(x,y)=\phi(x,y)=0$ where $(x,y)\in\Gamma$ (the distance to the boundary is 0 when the point lies on the boundary).
+
+\vspace{5pt}
+
+\noindent Note that we made the assumption that $\gamma^{*}$ was the only minimizer of (\ref{min-problem}). However, if $\text{card}|\Gamma|\geq2$, then there exist points in $\R^2$ for which (\ref{min-problem}) does not admit a single minimizer, but rather infinitely many. In this case, our solution $d(x,y)$ becomes non-differentiable at these points, which will be discussed in our analysis.
 \section{Numerical methods}
 \subsection{Discretization and scheme}
 %this is where you present your numerical method/scheme. You may additionally put accuracy, stability in here. Also talk about the implementation details here.
@@ -227,7 +252,18 @@ Hence, the iteration can be written as follows:
     \item \textbf{(2)} Place the boundary conditions $\Gamma=\{\gamma_1,\dots,\gamma_m\}$ on the domain. These points are fixed and should never be updated!
     \item \textbf{(3)} Apply a batch of sweeps to the domain, i.e. sweeps 1 to 4. If needed, sweep again the domain until convergence is met. To monitor convergence, compute at the $k$-th sweep $E = \max\limits_{i,j} \left| u_{i,j}^{(k)} - u_{i,j}^{(k-1)} \right|$ where $u_ {i,j}^{(k)}$ denotes the solution on the stencil $(i,j)$ after the $k$-th sweep.
 \end{itemize}
-
+\noindent During step \textbf{3} in the above, one needs to solve for every point $u_{i,j}$:
+\begin{equation}
+\label{system_eq}
+    [(u_{i,j}-a)^{+}]^2+[(u_{i,j}-b)^{+}]^2=f_{i,j}^2h^2
+\end{equation}
+\noindent where $a=\min\{u_{i-1,j},u_{i+1,j}\}$ and $b=\min\{u_{i,j-1},u_{i,j+1}\}$. The solution to (\ref{system_eq}) is given by:
+\begin{equation*}
+    \bar{u}=\begin{cases}
+        \min\{a,b\}+f_{i,j}h & \text {if }|a-b|\geq f_{i,j} \\
+        \frac{a+b+\sqrt{2f_{i,j}^2h^2-(a-b)^2}}{2} & \text {if }|a-b|< f_{i,j}
+    \end{cases}
+\end{equation*}
 \subsection{Code implementation}
 We implement the fast-sweeping method in Python using the \texttt{numpy} library \ref{}. All the scripts are available in the GitHub repository available in the introduction \ref{}. \\
 We replicate domains with the help of a class named \texttt{computational\_domain}
