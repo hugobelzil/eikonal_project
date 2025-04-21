@@ -252,7 +252,7 @@ Hence, the iteration can be written as follows:
     \item \textbf{(2)} Place the boundary conditions $\Gamma=\{\gamma_1,\dots,\gamma_m\}$ on the domain. These points are fixed and should never be updated!
     \item \textbf{(3)} Apply a batch of sweeps to the domain, i.e. sweeps 1 to 4. If needed, sweep again the domain until convergence is met. To monitor convergence, compute at the $k$-th sweep $E = \max\limits_{i,j} \left| u_{i,j}^{(k)} - u_{i,j}^{(k-1)} \right|$ where $u_ {i,j}^{(k)}$ denotes the solution on the stencil $(i,j)$ after the $k$-th sweep.
 \end{itemize}
-\noindent During step \textbf{3} in the above, one needs to solve for every point $u_{i,j}$:
+\noindent During step (\textbf{3}) in the above, one needs to solve the following equation for every point $u_{i,j}$:
 \begin{equation}
 \label{system_eq}
     [(u_{i,j}-a)^{+}]^2+[(u_{i,j}-b)^{+}]^2=f_{i,j}^2h^2
@@ -264,11 +264,27 @@ Hence, the iteration can be written as follows:
         \frac{a+b+\sqrt{2f_{i,j}^2h^2-(a-b)^2}}{2} & \text {if }|a-b|< f_{i,j}
     \end{cases}
 \end{equation*}
+
+\subsection{Properties of the Fast-Sweeping method}
+We report in this section several properties of the fast-sweeping method, some of them being shown in the results section.
+\begin{prop}[\textbf{Monotonicity of the scheme}]
+The fast-sweeping scheme in decreasing in the sweeps : $\forall i,j:u^{(k)}_{ij}-u^{(k-1)}_{ij}\leq0$
+\end{prop}
+\begin{prop}[\textbf{Number of sweeps and accuracy for distance functions}]
+    For the distance function in $\R^n$ ($F(x,y)\equiv1$), the fast-sweeping method converges in $2^n$ sweeps. However, this needs to be nuanced and argued differently. \\ \\
+    If $|\Gamma|=1$, the scheme converges exactly after $2^n$ sweeps. Hence, in 2 dimensions, a $5^{th}$ sweep will not update the numerical solution $u^h$. In this case, $\|u-u^h\|_{\infty}=\mathcal{O}(|h\log h|)$ \\ \\
+    If $|\Gamma|>1$, some points in the computational domain will be at the same distance to at least 2 boundary points in $\Gamma$. This creates an interaction between these boundary points and results in the following. After $2^n$ sweeps, the scheme is still $\mathcal{O}(|h\log h|)$, but further sweeps will still increase the accuracy of the numerical solution (i.e. sweeps still update the numerical solution). In this case, after $2^n+1$ sweeps or more, $\|u-u^h\|_\infty=\mathcal{O}(h)$
+\end{prop}
+
+\begin{prop}[\textbf{Number of sweeps and accuracy for general equations}]
+    In the case where the velocity field $F(x,y)$ is not constant, the number of sweeps needed depends on the characteristic curves, (and thus, on $F$). The accuracy for this case is $\mathcal{O}(\sqrt{h})$
+\end{prop}
+\noindent The proofs of these propositions are given in \ref{}.
 \subsection{Code implementation}
 We implement the fast-sweeping method in Python using the \texttt{numpy} library \ref{}. All the scripts are available in the GitHub repository available in the introduction \ref{}. \\
 We replicate domains with the help of a class named \texttt{computational\_domain}
 , equipped with the method \texttt{ComputationalDomain(N,a,b,c,d)} which instantiates an object with several attributes, including the attribute \texttt{grid} which is an $N\times N$ \texttt{Numpy} 2D array, representing the square $[a,b]\times[c,d]\subset\R^2$. The constructor of the class sets the initial value $M$ described above in section \ref{} to 100, but can be chosen by the user.\\
-This class is also equipped with the method \texttt{Gamma(coordinates)} which sets the boundary conditions in the domain. \texttt{coordinates} must be a list of 2D coordinates given as a indices, for example \texttt{coordinates = [(0,0), (1,0), (4,4)]}. Note that this method assumed Python indexing. For example, the code below would help create the following domain: \\
+This class is also equipped with the method \texttt{Gamma(coordinates)} which sets the boundary conditions in the domain. \texttt{coordinates} must be a list of 2D coordinates given as a indices, for example \texttt{coordinates = [(0,0), (1,0), (4,4)]}. Note that this method assumes that the coordinates are given in Python indexing. For example, the code below would help create the following domain: \\
 \begin{lstlisting}[language=Python, caption=Instance of computational domain, label=lst:fsweep]
 from computational_domain import ComputationalDomain
 domain = ComputationalDomain(N = 6, a = -1, b = 1, c = -1, d = 1)
@@ -285,8 +301,40 @@ $$\[
 100 & 100 & 100 & 0 & 100 & 100 \\
 100 & 100 & 100 & 100 & 100 & 100
 \end{bmatrix}
-\]$$
+\]$$ \\
 
+
+\noindent The code in the repository comes with 2 classes, \texttt{eikonal\_distance\_2D} and \texttt{eikonal\_general\_F}, which help treating distinctly the cases where $F(x,y)\equiv1$ and $F(x,y)\not\equiv1$. Both classes come with a method named \texttt{EikonalSolver()}, both taking as input an object of the \texttt{computational\_domain} described above. Additionally, the \texttt{EikonalSolver} method from the general function $F$ takes as input the function $F$. An example for both cases is available below. \\
+
+\begin{lstlisting}[language=Python, caption = Instance of an Eikonal Solver for the 2D distance function]
+from computational_domain import ComputationalDomain
+from solvers.eikonal_distance_2D import EikonalSolver
+dom = ComputationalDomain(N = 501, a = -1, b = 1, c = -1, d = -1)
+domain.Gamma([(250, 250)])
+
+solver = EikonalSolver(domain = dom)
+solver.BatchSweeps(k = 1)
+print(solver.grids_after_sweeps[-1])
+\end{lstlisting} \\
+
+\noindent In this code above, we solve the Eikonal equation for the distance to the origin over the square $[-1,1]^2$ with $N=501$ grid points. The \texttt{solver} object stores the grid after each sweep, and line 8 allows to access the last grid (after the fourth sweep), which is stored as a Numpy array. The snippet below extends the method to the general case. \\
+
+\begin{lstlisting}[language=Python, caption = Instance of an Eikonal Solver for a general velocity F]
+from computational_domain import ComputationalDomain
+from solvers.eikonal_general_F_2D import EikonalSolver
+dom = ComputationalDomain(N = 501, a = -1, b = 1, c = -1, d = -1)
+domain.Gamma([(250, 250)])
+eps = 1e-6
+
+def F(x,y):
+    return 1 + x**2 + y**2
+
+solver = EikonalSolver(domain = dom, F = F)
+solver.SweepUntilConvergence(epsilon = eps, verbose = True)
+print(solver.grids_after_sweeps[-1])
+\end{lstlisting}
+
+\noindent In this code above, our aim is to solve the Eikonal equation in the same domain, except that $F(x,y)=1+x^2+y^2$. Observe that we now use the method \texttt{SweepUntilConvergence}, which allows us to monitor the convergence and avoid unnecessary sweeps. After each sweep, the method computes the maximum change between the new grid and the one that had resulted from the previous sweep. If this change is below some threshold \texttt{epsilon}, the method stops. 
 
 \section{Results}
 \subsection{2D Distance function}
@@ -412,7 +460,7 @@ In this section, we make use of the fast-sweeping method discussed to bridge our
 In particular, one can show in optimal control theory that given the Eikonal equation set-up that we described above where $F(x,y)$ is the positive function defining the "velocity" inside, say a medium, then the shortest path in time $\textbf{X}(t)\subset \R^2$ that goes from $X_0$ to $\Gamma$ must satisfy the following diffential equation:
 \begin{equation}
 \label{general_form_optimal_path_DE}
-    \frac{d\textbf{X}(t)}{dt}=-\nabla u(\textbf{X}(t))
+    \frac{d\textbf{X}(t)}{dt}=-\nabla u(\textbf{X}(t)), \quad \textbf{X}(0)=X_0
 \end{equation}
 
 \noindent where $u$ is the solution to the Eikonal equation (\ref{original-eikonal}). In 2D, equation (\ref{general_form_optimal_path_DE}) can be rewritten as : 
