@@ -470,7 +470,7 @@ From Zhao, we know that for the general case $1/F(x,y)\not\equiv1$, the fast-swe
 \newpage
 
 \section{An application : Path planning}
-In this section, we make use of the fast-sweeping method discussed to bridge our solutions with another problem : path planning. Our goal is to compute an optimal path over a domain $\Omega\subset\R^2$, starting at a point $X_0\in \R^2$ to a target set $\Gamma$. \\
+In this section, we make use of the fast-sweeping method discussed to bridge our solutions with an application : path planning. Our goal is to compute an optimal path over a domain $\Omega\subset\R^2$, starting at a point $X_0\in \R^2$ to a target set $\Gamma$. \\
 In particular, one can show in optimal control theory that given the Eikonal equation set-up that we described above where $F(x,y)$ is the positive function defining the "velocity" inside, say a medium, then the shortest path in time $\textbf{X}(t)\subset \R^2$ that goes from $X_0$ to $\Gamma$ must satisfy the following diffential equation:
 \begin{equation}
 \label{general_form_optimal_path_DE}
@@ -490,12 +490,12 @@ In particular, one can show in optimal control theory that given the Eikonal equ
     \end{bmatrix}
 \end{equation}
 
-\noindent Several points need to be taken care of. First, observe that (\ref{optimal_path_DE_2D}) a time-continuous problem, while the solution $u$ obtained with the fast-sweeping method is discretized over a mesh with stepsize $h$. Therefore, we will need to be able to interpolate $\nabla u$ inside cells of a mesh grid. For this, we will use bilinear interpolation.
+\noindent Several points need to be taken care of. First, observe that (\ref{optimal_path_DE_2D}) a time-continuous problem, while the solution $u$ obtained with the fast-sweeping method is discretized over a mesh with stepsize $h$. Therefore, we will need to be able to interpolate $\nabla u$ inside the cells of a mesh grid. For this, we will use bilinear interpolation.
 \\
 Secondly, we will discretize \ref{optimal_path_DE_2D} forward in time using time-increments $\Delta t$ 
 
 \subsection{Bilinear interpolation}
-Since our numerical solutions $u$ to Eikonal equations are available over a finite grid after using the Fast-Sweeping method, we need to be able to interpolate the values of the gradient of $u$ for points that do not lie in the grid, i.e. points that lie inside cells of the grid. For this, we use bilinear interpolation.
+Since our numerical solutions $u$ to Eikonal equations are available over a finite grid after using the Fast-Sweeping method, we need to be able to interpolate the values of the gradient of $u$ for points that do not lie in the grid, i.e. points that lie inside the cells of the grid. For this, we use bilinear interpolation.
 
 
 \begin{tikzpicture}
@@ -551,7 +551,7 @@ Since our numerical solutions $u$ to Eikonal equations are available over a fini
 
 
 
-\subsection{Discretization of the ODE}
+\subsection{Discretization of the ODE system}
 As discussed above, we approach the differential equation \ref{optimal_path_DE_2D} using a forward-in-time Euler discretization.Let $x_i^{n}=x_i(n\Delta t), i=1,2$. The scheme is:
 \begin{equation}
     \begin{cases}
@@ -564,10 +564,70 @@ As discussed above, we approach the differential equation \ref{optimal_path_DE_2
     \end{cases}
 \end{equation}
 
-\noindent which we recognize as being a gradient descent, stopping when $[x_1^n,x_2^n]^T\in \Gamma$, and where $\Tilde{u_x}$ and $\Tilde{u_y}$ are the interpolated first derivaties of the numerical solution $u$
+\noindent which we recognize as being a gradient descent, stopping when $[x_1^n,x_2^n]^T\in \Gamma$, and where $\Tilde{u_x}$ and $\Tilde{u_y}$ are the interpolated first derivatives of the numerical solution $u$.
 
 \subsection{Example : light refraction with Snell's law}
+This example covers the refraction of light when it crosses 2 media with different refraction indices. Indeed, some of the first appearances of the Eikonal equations appeared in this type of problems. Consider the following problem : we look at rays of lights in a square domain, where the lower half of the domain's refraction index is 2, and the index is 1 in the upper half plane. Consider that light is emitted at the point $X_0$ and we want to know what is the path that the rays emitted at $X_0$ will take to get to $\Gamma$. By Fermat's principle, this path is unique and is the shortest in time. However, the change of medium will make the rays of light "change" direction at the interface. \\
 
+\begin{center}
+\begin{tikzpicture}[scale=4]
+  % Domain outline
+  \draw[thick] (0,0) rectangle (1,1);
+
+  % Colored background rectangles for media
+  \fill[blue!10] (0,0.5) rectangle (1,1);  % upper half (n = 1)
+  \fill[orange!20] (0,0) rectangle (1,0.5);  % lower half (n = 2)
+
+  % Interface line
+  \draw[dashed, thick] (0,0.5) -- (1,0.5);
+
+  % Medium labels
+  \node at (0.5,0.75) {\large$n = 1$};
+  \node at (0.5,0.10) {\large$n = 2$};
+
+  % Source point X0
+  \filldraw[blue] (0.4,0.2) circle (0.015) node[below left] {$X_0$};
+
+  % Target Gamma point
+  \filldraw[red] (0.8,0.9) circle (0.015) node[above right] {$\Gamma$};
+
+  % Refracted path
+  \draw[very thick, ->] (0.4,0.2) -- (0.48,0.5);
+  \draw[very thick, ->] (0.48,0.5) -- (0.8,0.9);
+
+  % Interface label
+  \node[below right] at (0.001,0.5) {Interface};
+
+\end{tikzpicture}
+\end{center}
+
+\noindent The refractive index $n=n(x,y)$ is inversely proportional to the speed in the medium. Hence, assume that we have solved the solution to (\ref{original-eikonal}) over $[-1,1]^2$, with $F(x,y)=F_2 =2$ in the lower half of $[-1,1]^2$, and $F(x,y)=F_1 = 1$ in the upper half. We know that in each media, the path will be straight lines that will intersect at the interface domain, on the line $y=0$. Therefore, one cam compute the coordinates of the point $x$ which minimizes the time travel of light over the path from $X_0=(x_0,y_0)$ and the target $\Gamma=(x_T,y_T)$, i.e.:
+
+\begin{equation}
+\label{travel_time}
+    \min_{x\in[-1,1]}T(x)=\underbrace{\frac{\sqrt{(x-x_0)^2+y_0^2}}{F_1}}_{\text{Time of travel in lower half}}+\underbrace{\frac{\sqrt{(x-x_T)^2+y_T^2}}{F_2}}_{\text{Time of travel in upper half}}
+\end{equation}
+
+\noindent Note that we strategically placed the interface on the line $y=0$, in order to simplify a bit this optimization problem. In our code, we chose $X_0=(x_0,y_0)=(0,-0.5)$ and $\Gamma =(0.5,0.5)$ which also simplifies the optimization problem. But we are still lazy and use \texttt{Scipy} in order to compute the solution to (\ref{travel_time}). \\
+\noindent Our next step is to solve \ref{optimal_path_DE_2D}, and compare our path to the true path which we obtained above by computing the $x$-coordinate on the interface. We use the \texttt{solvers.ODE\_backtracer} method available in the repository and obtain the path below.
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.6\textwidth]{plots/snell_path.png}
+  \caption{Backtraced path from $X_0$ to $\Gamma$ using the numerical solution to the ODE system (\ref{optimal_path_DE_2D})}
+  \label{fig:snell_path}
+\end{figure}
+
+\noindent This path seems correct but we would like to confirm that our implementation does converge to the true solution. Luckily, the previous work we did to compute the $x$-coordinate on the line $y=0$ can be compared with our path. For this purpose, we introduce the Hausdorff distance: \\
+
+\vspace{5pt}
+
+\noindent\textbf{Hausdorff distance between 2 curves :} Given 2 curves $S_1,S_2\subset \mathbb{R}^n$, the Hausdorff distance is a measure that quantifies how close in curves are to each other. It if formally defined as:
+\begin{equation*}
+    d_H(S_1,S_2)=\max\{\sup_{s_1\in S_1}d(s_1,S_2),\sup_{s_2\in S_2}d(S_1,s_2)\}
+\end{equation*}
+where $d(x,y)$ be a metric on $\R^2$. In our case, we only consider the euclidean meatric. Indeed, $d_H(S_1,S_2)=0\iff S_1=S_2$, and $S_n\xrightarrow{n\to\infty}S\iff\lim_{n\to\infty}d_H(S_n,S)=0$.
+Therefore, after obtaining our true path using Snell's law, we solve the ODE problem with several values of $\Delta t$, and compute $d_H(S_{\Delta_t},S)$ where $S_{\Delta_t}$ denotes the numerical path computed, and $S$ denotes the true path computed with Snell's law. We expect $d_H(S_{\Delta_t},S)\xrightarrow{\Delta_t\to0}0$
 \end{document}
 
 
