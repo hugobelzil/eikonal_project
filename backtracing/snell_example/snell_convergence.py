@@ -30,7 +30,7 @@ true_path = np.vstack([segment1, segment2])
 #LOADING THE GRID & REPLICATING THE VARIABLES IN exampleSnell.py
 dom = ComputationalDomain(N = 801, a = -1, b = 1, c = -1, d = 1)
 dom.Gamma([(200,600)])
-grid = np.load('snell_grid.npy')
+grid = np.load('../snell_grid.npy')
 
 # COMPUTING THE PATH
 path = ODE_backtracer(x0 = [x0,y0], dt = dom.h, domain = dom, u_grid = grid)

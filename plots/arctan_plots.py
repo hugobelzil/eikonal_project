@@ -23,12 +23,17 @@ plt.show(block=True)  # Keep the window open
 # Convergence plot for error vs. step size h
 #We fit the linear model in the error
 model = LinearRegression()
+model2 = LinearRegression()
+model3 = LinearRegression()
 X = np.array([(2/(N-1)) for N in index]).reshape(-1,1)
-model.fit(np.abs(X*np.log(X)), errors_atan)
-#model.fit(np.sqrt(X), errors_atan)
+model.fit(np.sqrt(X), errors_atan)
+model2.fit(np.abs(X*np.log(X)),errors_atan)
+model3.fit(X**2,errors_atan)
 A = float(model.coef_)
 B = float(model.intercept_)
-
+print('R^2 for sqrt h : ',model.score(np.sqrt(X), errors_atan))
+print('R^2 for hlogh : ',model2.score(np.abs(X*np.log(X)), errors_atan))
+print('R^2 for h^2 : ',model3.score(np.abs(X**2), errors_atan))
 x = np.linspace(np.min(X), np.max(X),150)
 plt.style.use(['science', 'grid'])
 plt.figure(figsize=(7.8, 4.8))

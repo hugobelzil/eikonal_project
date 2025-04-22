@@ -7,11 +7,11 @@ from computational_domain import ComputationalDomain
 def F(x, y):
     return 1 + 0.5*(x**2 + y**2)
 
-A = 21
+A = 36
 epsilon = 1e-6
 errors = []
 
-for N in [(20*i + 1) for i in range(1, A)]:
+for N in [(20*i + 1) for i in range(10, A)]:
     print("Running convergence analysis. N = ", N)
     unit_square = ComputationalDomain(N = N, a = -1, b = 1, c = -1, d = 1)
     unit_square.Gamma([(int((N-1)/2), int((N-1)/2))])
@@ -32,7 +32,7 @@ for N in [(20*i + 1) for i in range(1, A)]:
 
 print("Convergence analysis finished. Saving results.")
 np.save('2D_arctan_errors.npy', errors)
-np.save('N_index_errors_arctan.npy', [(20*i + 1) for i in range(1,A)])
+np.save('N_index_errors_arctan.npy', [(20*i + 1) for i in range(10,A)])
 
 # EXAMPLE ON LARGER GRID (FOR PLOTTING PURPOSES)
 domain2 = ComputationalDomain(N = 801, a = -2, b = 2, c = -2, d = 2)

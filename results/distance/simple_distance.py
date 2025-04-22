@@ -27,7 +27,8 @@ for N in [(20*i + 1) for i in range(10, A)]:
     unit_square.Gamma([(int((N-1)/2), int((N-1)/2))])
 
     solver = EikonalSolver(unit_square)
-    solver.SweepUntilConvergence(epsilon = epsilon)
+    #solver.SweepUntilConvergence(epsilon = epsilon, verbose = True)
+    solver.BatchSweeps(k = 1)
     numerical_solution = solver.grids_after_sweeps[-1]
 
     x = np.linspace(-1, 1, N)
