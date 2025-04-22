@@ -15,6 +15,9 @@
 \usepackage{microtype}                     % Better spacing, text aesthetics
 \usepackage{tikz}
 \usepackage{pgfplots}
+\usepackage{placeins}
+
+
 \pgfplotsset{compat=1.18}
 \usepgfplotslibrary{patchplots}
 \usetikzlibrary{3d}
@@ -271,13 +274,14 @@ We report in this section several properties of the fast-sweeping method, some o
 The fast-sweeping scheme in decreasing in the sweeps : $\forall i,j:u^{(k)}_{ij}-u^{(k-1)}_{ij}\leq0$
 \end{prop}
 \begin{prop}[\textbf{Number of sweeps and accuracy for distance functions}]
+\label{prop_distance_functions}
     For the distance function in $\R^n$ ($F(x,y)\equiv1$), the fast-sweeping method converges in $2^n$ sweeps. However, this needs to be nuanced and argued differently. \\ \\
     If $|\Gamma|=1$, the scheme converges exactly after $2^n$ sweeps. Hence, in 2 dimensions, a $5^{th}$ sweep will not update the numerical solution $u^h$. In this case, $\|u-u^h\|_{\infty}=\mathcal{O}(|h\log h|)$ \\ \\
     If $|\Gamma|>1$, some points in the computational domain will be at the same distance to at least 2 boundary points in $\Gamma$. This creates an interaction between these boundary points and results in the following. After $2^n$ sweeps, the scheme is still $\mathcal{O}(|h\log h|)$, but further sweeps will still increase the accuracy of the numerical solution (i.e. sweeps still update the numerical solution). In this case, after $2^n+1$ sweeps or more, $\|u-u^h\|_\infty=\mathcal{O}(h)$
 \end{prop}
 
 \begin{prop}[\textbf{Number of sweeps and accuracy for general equations}]
-    In the case where the velocity field $F(x,y)$ is not constant, the number of sweeps needed depends on the characteristic curves, (and thus, on $F$). The accuracy for this case is $\mathcal{O}(\sqrt{h})$
+    In the case where the velocity field $F(x,y)$ is not constant, the number of sweeps needed required to meet convergence depends on the characteristic curves, (and thus, on $F$). The accuracy for this case is $\mathcal{O}(\sqrt{h})$
 \end{prop}
 \noindent The proofs of these propositions are given in \ref{}.
 \subsection{Code implementation}
@@ -337,7 +341,7 @@ print(solver.grids_after_sweeps[-1])
 \noindent In this code above, our aim is to solve the Eikonal equation in the same domain, except that $F(x,y)=1+x^2+y^2$. Observe that we now use the method \texttt{SweepUntilConvergence}, which allows us to monitor the convergence and avoid unnecessary sweeps. After each sweep, the method computes the maximum change between the new grid and the one that had resulted from the previous sweep. If this change is below some threshold \texttt{epsilon}, the method stops. 
 
 \section{Results}
-\subsection{2D Distance function}
+\subsection{Distance functions in 2D}
 As argued above in part \ref{}, the Eikonal equation can be used to compute the shortest distance to a boundary $\Gamma \subset \R^n$. Therefore, we test our implementation for the BVP:
 \begin{equation}
 \label{cone_bvp}
@@ -347,26 +351,32 @@ As argued above in part \ref{}, the Eikonal equation can be used to compute the 
     \end{cases}
 \end{equation}
 The solution to this BVP is the 2D cone, given by $u(x,y)=\sqrt{x^2+y^2}$. Therefore, we can easily compare our numerical solution to the analytic one, and study its convergence as well.
-For the analysis below, we discretize the square $[-1,1]^2$ evenly with $N=257 \implies h \approx 0.0078$. The solution is obtained after monitoring the convergence of the sweeps : we sweep the domain until the $L_{\infty}$ norm of change between the current grid and the previous one is less than $\epsilon=10^{-6}$
+For solving numerically (\ref{cone_bvp}), we discretize the square $[-1,1]^2$ uniformly with $N=257 \implies h \approx 0.0078$. The numerical solution converges after exactly 4 sweeps, as outlined by proposition (\ref{prop_distance_functions}). \\
+
 \begin{figure}[h!]
     \centering
     \begin{minipage}{0.48\linewidth}
         \centering
         \includegraphics[width=\linewidth]{plots/contour_plot_2D_distance.png}
-        \caption{Contour plot of 2D distance.}
+        \caption{Contour plot of the numerical solution to (\ref{cone_bvp}).}
         \label{fig:contour-distance}
     \end{minipage}
     \hfill
     \begin{minipage}{0.48\linewidth}
         \centering
         \includegraphics[width=\linewidth]{plots/solution_3d_surface.png}
-        \caption{3D surface of the distance function.}
+        \caption{3D surface of the numerical solution.}
         \label{fig:3d-surface}
     \end{minipage}
 \end{figure}
 \vspace{20pt}
 
-\noindent Finally, we can analyze the convergence of the scheme for the solution above. As described by Zhao in \ref{}, the accuracy of the fast sweeping method is of order $O(|h\log h|)$. On the plot below, we can see that the fast-sweeping method we implemented indeed converges to the true function $u(x,y)=\sqrt{x^2+y^2}$ at the rate $O(|h\log h|)$
+\noindent Figure (\ref{fig:contour-distance}) shows the contour plots of the numerical solution. Note that since the analytical solution is $u(x,y)=\sqrt{x^2+y^2}$, we would expect in theory to have perfectly round circles. However, this remains an numerical approximation, explaining why we are seeing "oval" forms rather than perfect circles. If one were to decrease the step size $h$ (i.e. increase $N$), these ovals would eventually ressemble more and more to round circles.
+Figure (\ref{fig:3d-surface}) confirms as well that the numerical solution is somewhat close the cone we would expect \\
+
+\subsubsection{Convergence}
+Finally, we can analyze the convergence of the fast sweeping method for the BVP (\ref{cone_bvp}). The plot below was obtained was solving numerically the BVP, using $N\in\{201, 221,241,\dots,701\}$, converting to step sizes $h=\frac{N-1}{b-a}$. For every of these values, the numerical solutions is compared to the analytic solution. Specifically, the error is computed with the $L_\infty$ norm over the square $[-1,1]^2$. \\
+On figure (\ref{fig:error_distance}) below, we see that the accuracy of the fast sweeping method is indeed of order $O(|h\log h|)$.
 
 
 \begin{figure}[h]
@@ -376,8 +386,9 @@ For the analysis below, we discretize the square $[-1,1]^2$ evenly with $N=257 \
   \label{fig:error_distance}
 \end{figure}
 
-\subsubsection{Distance function with several boundary points}
-The example in the previous subsection was only considering one boundary value at the origin of the domain, i.e. the set $\Gamma$ was simply $\Gamma=\{(0,0)\}$. We can introduce several other boundary points, and the solution $u$ picked up by the fast sweeping-method will give at any point $(x,y)$ the distance to the closest point $\gamma\in\Gamma$, as we showed in section \ref{}. Indeed consider the case below, where we chose 5 points at random on $[-1,1]^2$, and set these points to be 0 in the domain. Our Eikonal solver then converges to the numerical solution $u(x,y)$ whose contours and 3D surface are given by figures x and x respectively.
+\subsection{Distance functions with several boundary points in 2D}
+The example in the previous subsection was only considering one boundary value at the origin of the domain, i.e. the set $\Gamma$ was simply $\Gamma=\{(0,0)\}$. We can introduce several other boundary points, and the solution $u$ picked up by the fast sweeping-method will give at any point $(x,y)$ the distance to the closest point $\gamma\in\Gamma$, as we showed in section \ref{section_on_distance}. Indeed consider the case below, where we chose 5 points at random on $[-1,1]^2$, and set these points to be 0 in the domain. Our Eikonal solver then converges to the numerical solution $u(x,y)$ whose contours and 3D surface are given by figures (\ref{fig:contour5}) and (\ref{fig:surface5}) respectively. \\
+It is easy to see on both the contour plots and on the 3D surface that the solution is non-differentiable on some lines inside the domain. In particular, the points on these lines are the ones lying at the same distance to at least 2 boundary points in $\Gamma$. In other words, the problem \ref{min-problem} does not have a unique minimizer for these sets of points.
 
 \vspace{5pt}
 
@@ -398,20 +409,21 @@ The example in the previous subsection was only considering one boundary value a
   \end{minipage}
 \end{figure}
 
-\vspace{5pt}
-\noindent Finally, we look at another case where we introduce several more boundary points in $\Gamma$. In the example below, we sampled uniformly at random 30 points in $[-1,1]^2$ and set these points to have value 0. A heatmap of the solution is:
+\FloatBarrier
+
+\noindent Finally, we look at another case where we introduce several more boundary points in $\Gamma$. In the example below, we sampled uniformly at random 30 points in $[-1,1]^2$ and set these points to have value 0. Figure (\ref{fig:heatmap30random}) represents a heatmap of the solution. The regions where the solution is non-differentiable are easily seen.
 
 \begin{figure}[h!]
   \centering
   \includegraphics[width=0.5\textwidth]{plots/heatmap_random30.png}
-  \caption{Your image caption}
+  \caption{Distance function in 2D for $|\Gamma|=30$}
   \label{fig:heatmap30random}
 \end{figure}
 
 \newpage
 
 \subsection{General Eikonal equations}
-In this subsection, we now are interested at problems of the form of \ref{original-eikonal} where $f(x,y)\not\equiv 1$ on the domain. Conveniently, we will also rewrite $f(x,y)=\frac{1}{F(x,y)}$, where $F(x,y)$ can now be thought of as a velocity over the domain. As a result, the solution $u(x,y)$ does not give the distance to the boundary anymore, but rather the "cost" of the travel from $(x,y)$ to $\Gamma$.
+In this subsection, we now are interested at problems of the form of (\ref{original-eikonal}) where $f(x,y)\not\equiv 1$ on the domain. Conveniently, we will also rewrite $f(x,y)=\frac{1}{F(x,y)}$, where $F(x,y)$ can now be thought of as a velocity over the domain, as argued in the introduction. As a result, the solution $u(x,y)$ does not give the distance to the boundary anymore, but rather the "cost" of the travel from $(x,y)$ to $\Gamma$.
 We test our solver for the problem.
 
 \begin{equation}
@@ -421,20 +433,7 @@ We test our solver for the problem.
         u(0,0)= 0
     \end{cases}
 \end{equation}
-One can easily check that $u(x,y)=\sqrt{2}\arctan\Big[\sqrt{\frac{x^2+y^2}{2}}\Big]$ solves (\ref{arctan_equation}). We use this reference to test our solver with the following parameters : $N=401$ on the discretized domain $[-1,1]^2$ which gives the step size $h=0.01$, with convergence criterion $\epsilon=10^{-6}$
-\subsubsection{Convergence}
-From Zhao, we know that for the general case $1/F(x,y)\not\equiv1$, the fast-sweeping method also converges to the true solution in $O(|h\log h|)$. For the reference problem defined in the section above, with $N\in\{21,41,\dots,401\}$, we get the following convergence to the true solution.
-
-\begin{figure}[h]
-  \centering
-  \includegraphics[width=0.6\textwidth]{plots/convergence2d_atan_step_size.png}
-  \caption{Convergence plot}
-  \label{fig:convarctan}
-\end{figure}
-
-\vspace{10pt}
-
-\noindent With $N=401$, the solution looks like the following:
+One can easily check that $u(x,y)=\sqrt{2}\arctan\Big[\sqrt{\frac{x^2+y^2}{2}}\Big]$ solves (\ref{arctan_equation}). We use this reference to test our solver with the following parameters : $N=401$ on the discretized domain $[-1,1]^2$ which gives the step size $h=0.01$, with convergence criterion $\epsilon=10^{-6}$. The contours and surface of the numerical solution are displayed below on figures (\ref{fig:contour_arctan}) and (\ref{fig:surface_arctan})
 \begin{figure}[h]
   \centering
   \begin{minipage}{0.45\textwidth}
@@ -451,6 +450,19 @@ From Zhao, we know that for the general case $1/F(x,y)\not\equiv1$, the fast-swe
     \label{fig:surface_arctan}
   \end{minipage}
 \end{figure}
+
+\subsubsection{Convergence}
+From Zhao, we know that for the general case $1/F(x,y)\not\equiv1$, the fast-sweeping method also converges to the true solution in $\mathcal{O}(\sqrt{h})$. For the reference problem defined in the section above, with $N\in\{21,41,\dots,401\}$, we get the following convergence to the true solution.
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.6\textwidth]{plots/convergence2d_atan_step_size.png}
+  \caption{Convergence plot}
+  \label{fig:convarctan}
+\end{figure}
+
+\vspace{10pt}
+
 
 
 \newpage
