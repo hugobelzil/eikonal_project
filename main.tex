@@ -429,11 +429,13 @@ We test our solver for the problem.
 \begin{equation}
 \label{arctan_equation}
     \begin{cases}
-        \|\nabla u(x,y)\|_2=\frac{1}{1+0.5(x^2+y^2)} , \quad(x,y) \in [-1,1]^2 \\
+        \|\nabla u(x,y)\|_2=\frac{1}{1+0.5(x^2+y^2)} , \quad(x,y) \in [-2,2]^2 \\
         u(0,0)= 0
     \end{cases}
-\end{equation}
-One can easily check that $u(x,y)=\sqrt{2}\arctan\Big[\sqrt{\frac{x^2+y^2}{2}}\Big]$ solves (\ref{arctan_equation}). We use this reference to test our solver with the following parameters : $N=401$ on the discretized domain $[-1,1]^2$ which gives the step size $h=0.01$, with convergence criterion $\epsilon=10^{-6}$. The contours and surface of the numerical solution are displayed below on figures (\ref{fig:contour_arctan}) and (\ref{fig:surface_arctan})
+\end{equation} \\
+
+One can easily check that $u(x,y)=\sqrt{2}\arctan\Big[\sqrt{\frac{x^2+y^2}{2}}\Big]$ solves (\ref{arctan_equation}). We use this reference to test our solver with the following parameters : $N=801$ on the discretized domain $[-2,2]^2$ which gives the step size $h=0.01$, with convergence criterion $\epsilon=10^{-6}$. The contours and surface of the numerical solution are displayed below on figures (\ref{fig:contour_arctan}) and (\ref{fig:surface_arctan}). \\
+
 \begin{figure}[h]
   \centering
   \begin{minipage}{0.45\textwidth}
@@ -452,7 +454,7 @@ One can easily check that $u(x,y)=\sqrt{2}\arctan\Big[\sqrt{\frac{x^2+y^2}{2}}\B
 \end{figure}
 
 \subsubsection{Convergence}
-From Zhao, we know that for the general case $1/F(x,y)\not\equiv1$, the fast-sweeping method also converges to the true solution in $\mathcal{O}(\sqrt{h})$. For the reference problem defined in the section above, with $N\in\{21,41,\dots,401\}$, we get the following convergence to the true solution.
+From Zhao, we know that for the general case $1/F(x,y)\not\equiv1$, the fast-sweeping method also converges to the true solution in $\mathcal{O}(\sqrt{h})$. For the reference problem defined in the section above, with $N\in\{21,41,\dots,401\}$, we get the following convergence to the true solution. Note that the domain is smaller than for the 
 
 \begin{figure}[h]
   \centering
@@ -563,6 +565,8 @@ As discussed above, we approach the differential equation \ref{optimal_path_DE_2
 \end{equation}
 
 \noindent which we recognize as being a gradient descent, stopping when $[x_1^n,x_2^n]^T\in \Gamma$, and where $\Tilde{u_x}$ and $\Tilde{u_y}$ are the interpolated first derivaties of the numerical solution $u$
+
+\subsection{Example : light refraction with Snell's law}
 
 \end{document}
 
