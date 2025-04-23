@@ -662,6 +662,7 @@ Therefore, after obtaining our true path using Snell's law, we solve the ODE pro
 
 \subsection{Paths avoiding objects}
 In this final section, we use our path planning technique developped in the section aboves to some more interesting examples. In the examples below, we let the velocity function $F(x,y)$ take different values on the different regions of the domain, set a starting point and a target and let our ODE solver compute the optimal path.
+
 \begin{figure}[h]
   \centering
   \begin{minipage}{0.45\textwidth}
@@ -684,7 +685,7 @@ In this final section, we use our path planning technique developped in the sect
   \begin{minipage}{0.45\textwidth}
     \centering
     \includegraphics[width=\textwidth]{plots/path_mountain_fast_lane.png}
-    \caption{Path backtraced on the domain, the heatmap represent the values of $F(x,y)$}
+    \caption{Path backtraced on the domain, the heatmap represent the values of $F(x,y)$. Unlike above, we added a fast lane (yellow)}
   \end{minipage}
   \hfill
   \begin{minipage}{0.45\textwidth}
@@ -694,6 +695,7 @@ In this final section, we use our path planning technique developped in the sect
     \label{3d_surface_mountain}
   \end{minipage}
 \end{figure}
+\FloatBarrier
 
 \noindent It is interesting to see that the path indeed avoids these regions with low velocities, which can be visualized more easily on figure (\ref{3d_surface_mountain}).
 \end{document}
