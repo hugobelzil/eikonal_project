@@ -45,7 +45,7 @@ print("Target in (x,y) : ", target)
 plt.style.use(['science', 'grid'])
 plt.figure(figsize=(7.8, 4.8))
 # if displaying the function F, origin must be 'lower'. If showing u : origin = 'upper'
-plt.imshow(Z, origin = "lower", extent=(dom.a, dom.b, dom.c, dom.d), cmap='plasma')
+plt.imshow(Z, origin = "lower", extent=(dom.a, dom.b, dom.c, dom.d), cmap='viridis')
 cbar = plt.colorbar()
 cbar.set_label(r"$F(x, y)$", fontsize=14)
 plt.plot(path[:,0], path[:,1], color='black', linewidth=1, label='Path')
