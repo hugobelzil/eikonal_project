@@ -416,7 +416,7 @@ It is easy to see on both the contour plots and on the 3D surface that the solut
 \begin{figure}[h!]
   \centering
   \includegraphics[width=0.5\textwidth]{plots/heatmap_random30.png}
-  \caption{Distance function in 2D for $|\Gamma|=30$}
+  \caption{Distance function in 2D for $|\Gamma|=30$ (random boundary points)}
   \label{fig:heatmap30random}
 \end{figure}
 
@@ -590,14 +590,14 @@ This example covers the refraction of light when it crosses 2 media with differe
   \draw[dashed, thick] (0,0.5) -- (1,0.5);
 
   % Medium labels
-  \node at (0.5,0.75) {\large$n = 1$};
-  \node at (0.5,0.10) {\large$n = 2$};
+  \node at (0.25,0.75) {\large$n = 1$};
+  \node at (0.75,0.10) {\large$n = 2$};
 
   % Source point X0
   \filldraw[blue] (0.4,0.2) circle (0.015) node[below left] {$X_0$};
 
   % Target Gamma point
-  \filldraw[red] (0.8,0.9) circle (0.015) node[above right] {$\Gamma$};
+  \filldraw[red] (0.8,0.85) circle (0.015) node[above right] {$\Gamma$};
 
   % Refracted path
   \draw[very thick, ->] (0.4,0.2) -- (0.48,0.5);
@@ -635,9 +635,33 @@ This example covers the refraction of light when it crosses 2 media with differe
     d_H(S_1,S_2)=\max\{\sup_{s_1\in S_1}d(s_1,S_2),\sup_{s_2\in S_2}d(S_1,s_2)\}
 \end{equation*}
 where $d(x,y)$ be a metric on $\R^2$. In our case, we only consider the euclidean metric. Indeed, $d_H(S_1,S_2)=0\iff S_1=S_2$, and $S_n\xrightarrow{n\to\infty}S\iff\lim_{n\to\infty}d_H(S_n,S)=0$.
-Therefore, after obtaining our true path using Snell's law, we solve the ODE problem with several values of $\Delta t$, and compute $d_H(S_{\Delta_t},S)$ where $S_{\Delta_t}$ denotes the numerical path computed, and $S$ denotes the true path computed with Snell's law. We expect $d_H(S_{\Delta_t},S)\xrightarrow{\Delta_t\to0}0$, and that is what we obtain indeed:
+Therefore, after obtaining our true path using Snell's law, we solve the ODE problem with several values of $\Delta t$, and compute $d_H(S_{\Delta_t},S)$ where $S_{\Delta_t}$ denotes the numerical path computed, and $S$ denotes the true path computed with Snell's law. We expect $d_H(S_{\Delta_t},S)\xrightarrow{\Delta_t\to0}0$, and that is what we obtain indeed for $\Delta_t\in[1.75h,3h]$ \\
 
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.7\linewidth]{plots/loglog_plot_convergence_path.png}
+  \caption{Log-Log plot of the Hausdorff distance versus $\Delta t$}
+  \label{fig:loglog_conv_hausdorff}
+\end{figure} \\
 
+\FloatBarrier
+
+\noindent Notice that for these range of values, we have a line with slope roughly equal to 1 for all points. This is expected since the forward-int-time Euler discretization is of order $\mathcal{O}(\Delta_t)$. However, we notice that around $\log(\Delta_t)\approx-5.25$, there seems to be a drop in the log Hausdorff distance, and the errors seems to plateau beyond this point. We verify this assumption by plotting the error over a larger range ($\Delta_t\in[h,3h]$) \\
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=0.7\linewidth]{plots/loglog_plot_convergence_path_larger_window.png}
+  \caption{Log-Log plot of the Hausdorff distance versus $\Delta t$ on a larger window for $\Delta
+  _t$}
+  \label{fig:loglog_conv_hausdorff}
+\end{figure} 
+
+\FloatBarrier
+
+\noindent Our claim is the following : even if our numerical ODE solver's accuracy is of order $\mathcal{O}(\Delta_t)$, this plateau probably occurs at a point, where it is now our bilinear interpolation which causes this error to plateau with respect to $\Delta_t$. In other words, after this , the error induced by lowering $\Delta_t$ is lower than the error induced by the bilinear interpolation.
+
+\subsection{Paths avoiding objects}
+In this final section, we use our path planning technique developped in the section aboves to some more interesting examples. In the examples below, we let the velocity function $F(x,y)$ take different values on the different regions of the domain, set a starting point and a target and let our ODE solver compute the optimal path.
 
 \end{document}
 
