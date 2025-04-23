@@ -140,33 +140,27 @@ The Eikonal equations have several applications across many fields of mathematic
 \begin{equation}
 \label{original-eikonal}
     \begin{cases}
-        |\nabla u(\textbf{x})|=f(\textbf{x}) , \quad\textbf{x} \in\R^n\\
-        u(\textbf{x})=\phi(\textbf{x}),\quad \textbf{x} \in \Gamma \subset \R^n
+        |\nabla u(\vec{x})|=f(\vec{x}) , \quad\vec{x} \in\Omega\\
+        u(\vec{x})=\phi(\vec{x}),\quad \vec{x} \in \Gamma \subset \Omega
     \end{cases}
 \end{equation}
-where $|\cdot|$ denotes the Euclidean norm in $\R^n$, and $u,f,\phi:\R^n\xrightarrow{}\R$. Alternatively, we can rewrite \eqref{original-eikonal} as 
-\begin{equation}
-    \begin{cases}
-        \sum_{i=1}^{n}\big(\frac{\partial u}{\partial x_i}\big)^2=f^2(\textbf{x}) , \quad\textbf{x} \in\R^n\\
-        u(\textbf{x})=\phi(\textbf{x}),\quad \textbf{x} \in \Gamma \subset \R^n
-    \end{cases}
-\end{equation}
+where $|\cdot|$ denotes the Euclidean norm in $\R^n$, and $u,f,\phi:\R^n\xrightarrow{}\R$. \\
 
-\noindent In this report, we will focus on solving the Eikonal equation in 2 space dimensions. We will use the discretization and fast-sweeping method proposed by Zhao in 2008. Before this, we will present some interpretations of the meaning of $u(x,y)$, as well as a use of our solution for optimal path planning.
+\noindent In this report, we will focus on solving Eikonal equations in 2 space dimensions. We will introduce the discretization and fast-sweeping method proposed by H.Zhao in 2008 \cite{zhao2005}, considering several scenarios for $f(x,y)$ and $\Gamma$, and observing some numerical results. Finally, we will use these results and apply them to an optimal control problem : path planning.
 
 \section{Theory}
 %Introduce the equation and give some details
 \subsection{Origins and derivation}
-Eikonal equations are common equations, encountered in several fields of the sciences. They first arose in geometric optics problems on the propagation of light waves, the term \textit{eikonal} being a germanization of the greek word \textit{eikon}, meaning "image" or "icon". Wikipedia \ref{} We will see in section \ref{} an example where it applies to the refraction of light in changing media.
-\vspace{10pt}
-These equations however arise in several other fields, including optimal control theory and robotics. The solutions of eikonal equations can be used to compute optimal paths in time, as we will see in section \ref{}.
-\vspace{10pt}
-In particular, the differential equation (\ref{original-eikonal}) can be derived from level-set equations, for the propagation of a front for example. If we let the 0-level set of a function $\phi(\vec{x},t)$ represent a curve or a surface moving in space (being a front), we need the function $\phi$ to satisfy the advection equation: \\
+Eikonal equations are common equations, encountered in several fields of the sciences. They first arose in geometric optics problems on the propagation of light waves, the term \textit{eikonal} being a germanization of the greek word \textit{eikon}, meaning "image" or "icon"\cite{wiki-eikonal}. We will see in section (\ref{section_snells_law}) an example where it applies to the refraction of light in changing media. \\
+
+\noindent These equations however arise in several other fields, including optimal control theory and robotics. The solutions of eikonal equations can also be used to compute optimal paths in time, as we will see in section (\ref{path_planning}). \\
+
+\noindent In particular, the differential equation (\ref{original-eikonal}) can be derived from level-set equations, for the propagation of a front for example. If we let the 0-level set of a function $\phi(\vec{x},t)$ represent a curve or a surface moving in space (being a front), we need the function $\phi$ to satisfy the advection equation: \\
 \begin{equation}
 \label{level_set_equation}
     \phi_t+F(\vec{x})|\nabla \phi| =0
 \end{equation} \\
-where $F:\vec{x}\rightarrow\R$ represents the velocity at which the point $\vec{x}$ on the curve (or surface) moves. If we restrict $F$ to be strictly positive, we force the curve to move "outwards" and extend in space. This assumption allows us the make the ansatz that $\phi$ can be expressed as : $\phi(\vec{x},t)=\psi(\vec{x})-t$. The reason for this is the following : this rewriting allows us to think of $\psi(\vec{x})$ as the arrival time of the front (the curve) to the point $\vec{x}$ in space. Indeed, recall that the curve is described as the 0-level set of $\phi(\vec{x},t)$. We can now plug-in this ansatz into (\ref{level_set_equation}) and get: \\
+where $F:\vec{x}\rightarrow\R$ represents the velocity at which the point $\vec{x}$ on the curve (or surface) moves. If we restrict $F$ to be strictly positive, we force the curve to move "outwards" and extend in space. This assumption allows us the make the ansatz that $\phi$ can be expressed as : $\phi(\vec{x},t)=\psi(\vec{x})-t$. The reason for this is the following : this rewriting allows us to think of $\psi(\vec{x})$ as the arrival time of the curve (or front) to the point $\vec{x}$ in space. Indeed, recall that the curve is described as the 0-level set of $\phi(\vec{x},t)$. We can now plug-in this ansatz into (\ref{level_set_equation}) and get: \\
 \begin{align*}
     & (\psi(\vec{x})-t)_t+F|\nabla(\psi(\vec{x})-t)|=0 \\
     &\implies-1 +F|\nabla\psi| = 0 \\
@@ -174,9 +168,9 @@ where $F:\vec{x}\rightarrow\R$ represents the velocity at which the point $\vec{
 \end{align*} \\
 \noindent which indeed gives an Eikonal equation. In the front-propagation context, we can hence interpret the solution as the following : the arrival times $\psi$ in space of a front starting at a point $\gamma$ and propagating in a medium with speed $F$ must solve the eikonal equation
 \begin{equation*}
-    |\nabla\psi(\textbf{x})|=\frac{1}{F(\textbf{x})}, \quad \psi(\gamma)=0
+    |\nabla\psi(\vec{x})|=\frac{1}{F(\vec{x})}, \quad \psi(\gamma)=0
 \end{equation*}
-When $F\equiv1$, the front is moving through a uniform media, at the same speed everywhere. Hence, we can view $\psi$ as the distance to $\gamma$ (see section \ref{section_on_distance}). In the analysis above, we let $\gamma$ be a single point in space, but the front could also originate from a curve, or several points in space, as we will see below. In this case, we have now a set of boundary conditions $\Gamma$.
+When $F\equiv1$, the front is moving through a uniform media, at the same speed everywhere. Hence, we can view $\psi$ as the distance to $\gamma$ (see section \ref{section_on_distance}). In the analysis above, we let $\gamma$ be a single point in space, but the front could also originate from a curve, or several points in space, as we will see later in this report.
 
 \subsection{Distance function in 2D}
 \label{section_on_distance}
@@ -190,17 +184,17 @@ Consider this problem in $\R^2$, if we let $(x,y)$ such that its closest point i
     d(x,y) = \sqrt{(x-\gamma_1)^2+(y-\gamma_2)^2} \\[10pt] 
     \implies\frac{\partial d}{\partial x}=\frac{x-\gamma_1}{\sqrt{(x-\gamma_1)^2+(y-\gamma_2)^2}}, \quad 
     \frac{\partial d}{\partial y}=\frac{y-\gamma_2}{\sqrt{(x-\gamma_1)^2+(y-\gamma_2)^2}} \\[10pt] 
-    \implies \|\nabla d(x,y)\|^{2}_{2} = \Bigg(\frac{\partial d}{\partial x}\Bigg)^2 + \Bigg(\frac{\partial d}{\partial y}\Bigg)^2=1
+    \implies |\nabla d(x,y)| = \sqrt{\Bigg(\frac{\partial d}{\partial x}\Bigg)^2 + \Bigg(\frac{\partial d}{\partial y}\Bigg)^2}=1
 \end{gather*}
-Indeed, $d(x,y)$ solves the Eikonal equation where $f(x,y) \equiv 1$, and naturally we have $d(x,y)=\phi(x,y)=0$ where $(x,y)\in\Gamma$ (the distance to the boundary is 0 when the point lies on the boundary).
+Indeed, $d(x,y)$ solves the Eikonal equation where $f(x,y) \equiv 1$, and naturally we have $d(x,y)=0$ where $(x,y)\in\Gamma$ (the distance to the boundary is 0 when the point lies on the boundary).
 
 \vspace{5pt}
 
-\noindent Note that we made the assumption that $\gamma^{*}$ was the only minimizer of (\ref{min-problem}). However, if $\text{card}|\Gamma|\geq2$, then there exist points in $\R^2$ for which (\ref{min-problem}) does not admit a single minimizer, but rather infinitely many. In this case, our solution $d(x,y)$ becomes non-differentiable at these points, which will be discussed in our analysis.
+\noindent Note that we made the important assumption that $\gamma^{*}$ was the only minimizer of (\ref{min-problem}). However, if $\text{card}|\Gamma|\geq2$, then there exist points in $\R^2$ for which (\ref{min-problem}) does not admit a single minimizer, but rather infinitely many. In this case, $d(x,y)$ becomes non-differentiable at these points, which will be discussed in our analysis.
 \section{Numerical methods}
 \subsection{Discretization and scheme}
 %this is where you present your numerical method/scheme. You may additionally put accuracy, stability in here. Also talk about the implementation details here.
-H. Zhao proposed the fast-sweeping method in ?? to solve Eikonal equations numerically. His proposed the following discretization, which uses Gauss-Seidel iterations. In 2 dimensions, given a space step $h$, the proposed scheme is:
+H. Zhao proposed the fast-sweeping method in \cite{zhao2005} to solve Eikonal equations numerically. He proposed the following discretization, which uses Gauss-Seidel iterations. In 2 dimensions, given a space step $h$, the scheme is:
 
 \begin{equation*}
     ((u_{i,j}-u_{xmin})^{+})^2+((u_{i,j}-u_{ymin})^{+})^2 = f_{i,j}^{2}h^2
@@ -212,11 +206,11 @@ H. Zhao proposed the fast-sweeping method in ?? to solve Eikonal equations numer
     \item $u_{i,j}\approx u(ih,jh)$, $u_{xmin} = \min\{u_{i-1,j},u_{i+1,j}\}$ and $u_{ymin} = \min\{u_{i,j-1},u_{i,j+1}\}$
 \end{itemize}
 
-\noindent Figure \ref{fig:graph_discretization} shows a visualization of the scheme. The updates of the points $u_{i,j}$ must be done by "sweeping" the domain in all 4 possible directions (or $2^d$ directions in $\mathbb{R}^d$), after having initialized a grid. Without loss of generality, the sweeps in 2 dimensions can be done as follows, assuming a square domain:
+\noindent Figure (\ref{fig:graph_discretization}) shows the dependence of $u_{ij}$ on its neighbouring points during an update. The updates of the points $u_{i,j}$ must be done by "sweeping" the domain in all 4 possible directions (or $2^d$ directions in $\mathbb{R}^d$), after having initialized a grid. Although the order of the sweeps does not matter, the sweeps in 2 dimensions can be done as follows, assuming a square domain:
 \begin{itemize}
     \item \textbf{Sweep 1 : } Start from the bottom-left corner of the domain, updating the points from left to right. Hence, the last point updated is the top-right corner one.
     \item \textbf{Sweep 2 : } Start from the bottom-right corner of the domain, updating the points from right to left. This gets us to the last point updated being the top-left corner one.
-    \item  \textbf{Sweep 3 : } Start from the top-left corner of the domain, updating from left to right. Similarly, the last point to be updated is the bottom-right corner one
+    \item  \textbf{Sweep 3 : } Start from the top-left corner of the domain, updating from left to right. Similarly, the last point to be updated is the bottom-right corner one.
     \item \textbf{Sweep 4 : } Last possible direction. Start from top-right corner of the domain, updating the points from right to left. The last point to be updated is the bottom left corner.
 \end{itemize}
 
@@ -249,7 +243,7 @@ H. Zhao proposed the fast-sweeping method in ?? to solve Eikonal equations numer
     \label{fig:graph_discretization}
 \end{figure}
 
-Hence, the iteration can be written as follows:
+\noindent Hence, a full iteration of the scheme can be described as follows:
 \begin{itemize}
     \item \textbf{(1)} Initialize the computational domain by setting all points to a large value $M$ (this value should be larger than the largest value of the solution $u$ in the domain).
     \item \textbf{(2)} Place the boundary conditions $\Gamma=\{\gamma_1,\dots,\gamma_m\}$ on the domain. These points are fixed and should never be updated!
@@ -266,28 +260,33 @@ Hence, the iteration can be written as follows:
         \min\{a,b\}+f_{i,j}h & \text {if }|a-b|\geq f_{i,j} \\
         \frac{a+b+\sqrt{2f_{i,j}^2h^2-(a-b)^2}}{2} & \text {if }|a-b|< f_{i,j}
     \end{cases}
-\end{equation*}
+\end{equation*} \\
+\noindent Finally, $u_{ij}\leftarrow\min\{u_{ij},\bar{u}\}$.
+
 
 \subsection{Properties of the Fast-Sweeping method}
-We report in this section several properties of the fast-sweeping method, some of them being shown in the results section.
+We report in this section several properties of the fast-sweeping method.
 \begin{prop}[\textbf{Monotonicity of the scheme}]
-The fast-sweeping scheme in decreasing in the sweeps : $\forall i,j:u^{(k)}_{ij}-u^{(k-1)}_{ij}\leq0$
+The fast-sweeping scheme in decreasing in the sweeps : $\forall{}\ i,j:u^{(k)}_{ij}-u^{(k-1)}_{ij}\leq0$
 \end{prop}
-\begin{prop}[\textbf{Number of sweeps and accuracy for distance functions}]
+\begin{prop}[\textbf{Number of sweeps and accuracy for distance functions*}]
 \label{prop_distance_functions}
     For the distance function in $\R^n$ ($F(x,y)\equiv1$), the fast-sweeping method converges in $2^n$ sweeps. However, this needs to be nuanced and argued differently. \\ \\
     If $|\Gamma|=1$, the scheme converges exactly after $2^n$ sweeps. Hence, in 2 dimensions, a $5^{th}$ sweep will not update the numerical solution $u^h$. In this case, $\|u-u^h\|_{\infty}=\mathcal{O}(|h\log h|)$ \\ \\
-    If $|\Gamma|>1$, some points in the computational domain will be at the same distance to at least 2 boundary points in $\Gamma$. This creates an interaction between these boundary points and results in the following. After $2^n$ sweeps, the scheme is still $\mathcal{O}(|h\log h|)$, but further sweeps will still increase the accuracy of the numerical solution (i.e. sweeps still update the numerical solution). In this case, after $2^n+1$ sweeps or more, $\|u-u^h\|_\infty=\mathcal{O}(h)$
+    If $|\Gamma|>1$, some points in the computational domain will be at the same distance to at least 2 boundary points in $\Gamma$. This creates an interaction between these boundary points and results in the following. After $2^n$ sweeps, the scheme is still $\mathcal{O}(|h\log h|)$, but further sweeps will still increase the accuracy of the numerical solution (i.e. sweeps still update the numerical solution). In this case, after $2^n+1$ sweeps or more, $\|u-u^h\|_\infty=\mathcal{O}(h)$. \textbf{*REMARK : } this proposition is our understanding from the paper of H. Zhao, but needs to be verified. This will be updated in a future version of this report.
 \end{prop}
 
-\begin{prop}[\textbf{Number of sweeps and accuracy for general equations}]
-    In the case where the velocity field $F(x,y)$ is not constant, the number of sweeps needed required to meet convergence depends on the characteristic curves, (and thus, on $F$). The accuracy for this case is $\mathcal{O}(\sqrt{h})$
+\begin{prop}[\textbf{*Number of sweeps and accuracy for general equations}]
+    In the case where the velocity field $F(x,y)$ is not constant, the number of sweeps needed required to meet convergence depends on the characteristic curves, (and thus, on $F$). \\ \\
+    If $|\Gamma|=1$ and $F$ is smooth, this is a special case where we can have an accuracy of order $h\log h$, as for the distance function case above. This is observed non-rigorously later in this report. \\ \\
+    If $\Gamma$ and $F$ are such that the solution $u$ develops non-differentiabilities, it appears that the scheme's accuracy becomes of order $\sqrt{h}$. \\
+    \textbf{*REMARK : } As for the proposition above, this needs to be verified and will be updated in the future.
 \end{prop}
-\noindent The proofs of these propositions are given in \ref{}.
-\subsection{Code implementation}
-We implement the fast-sweeping method in Python using the \texttt{numpy} library \ref{}. All the scripts are available in the GitHub repository available in the introduction \ref{}. \\
+
+\subsection{Implementation details}
+We implement the fast-sweeping method in Python. All scripts are available in the GitHub repository (link the introduction). \\
 We replicate domains with the help of a class named \texttt{computational\_domain}
-, equipped with the method \texttt{ComputationalDomain(N,a,b,c,d)} which instantiates an object with several attributes, including the attribute \texttt{grid} which is an $N\times N$ \texttt{Numpy} 2D array, representing the square $[a,b]\times[c,d]\subset\R^2$. The constructor of the class sets the initial value $M$ described above in section \ref{} to 100, but can be chosen by the user.\\
+, equipped with the method \texttt{ComputationalDomain(N,a,b,c,d)} which instantiates an object with several attributes, including the attribute \texttt{grid} which is an $N\times N$ Numpy 2D array \cite{numpy}, representing the square $[a,b]\times[c,d]\subset\R^2$. The constructor of the class sets the initial value $M$ mentioned above to 100, but can be chosen by the user.\\
 This class is also equipped with the method \texttt{Gamma(coordinates)} which sets the boundary conditions in the domain. \texttt{coordinates} must be a list of 2D coordinates given as a indices, for example \texttt{coordinates = [(0,0), (1,0), (4,4)]}. Note that this method assumes that the coordinates are given in Python indexing. For example, the code below would help create the following domain: \\
 \begin{lstlisting}[language=Python, caption=Instance of computational domain, label=lst:fsweep]
 from computational_domain import ComputationalDomain
@@ -308,7 +307,7 @@ $$\[
 \]$$ \\
 
 
-\noindent The code in the repository comes with 2 classes, \texttt{eikonal\_distance\_2D} and \texttt{eikonal\_general\_F}, which help treating distinctly the cases where $F(x,y)\equiv1$ and $F(x,y)\not\equiv1$. Both classes come with a method named \texttt{EikonalSolver()}, both taking as input an object of the \texttt{computational\_domain} described above. Additionally, the \texttt{EikonalSolver} method from the general function $F$ takes as input the function $F$. An example for both cases is available below. \\
+\noindent The code in the repository comes with 2 classes, \texttt{eikonal\_distance\_2D} and \texttt{eikonal\_general\_F}, which help treating distinctly the cases where $F(x,y)\equiv1$ and $F(x,y)\not\equiv1$. Both classes come with a method named \texttt{EikonalSolver()}, both taking as input an object of the class \texttt{computational\_domain} described above. Additionally, the \texttt{EikonalSolver} method from the general function $F$ takes as input the function $F$. An example for both cases is available below. \\
 
 \begin{lstlisting}[language=Python, caption = Instance of an Eikonal Solver for the 2D distance function]
 from computational_domain import ComputationalDomain
@@ -321,7 +320,7 @@ solver.BatchSweeps(k = 1)
 print(solver.grids_after_sweeps[-1])
 \end{lstlisting} \\
 
-\noindent In this code above, we solve the Eikonal equation for the distance to the origin over the square $[-1,1]^2$ with $N=501$ grid points. The \texttt{solver} object stores the grid after each sweep, and line 8 allows to access the last grid (after the fourth sweep), which is stored as a Numpy array. The snippet below extends the method to the general case. \\
+\noindent In this code above, we solve the Eikonal equation for the distance to the origin over the square $[-1,1]^2$ with $N=501$ grid points. The \texttt{solver} object stores the grid after each sweep, and line 8 allows to access the last grid (after the fourth sweep), which is stored as a Numpy array. The snippet below extends the method to the general function $F$. \\
 
 \begin{lstlisting}[language=Python, caption = Instance of an Eikonal Solver for a general velocity F]
 from computational_domain import ComputationalDomain
@@ -338,7 +337,7 @@ solver.SweepUntilConvergence(epsilon = eps, verbose = True)
 print(solver.grids_after_sweeps[-1])
 \end{lstlisting}
 
-\noindent In this code above, our aim is to solve the Eikonal equation in the same domain, except that $F(x,y)=1+x^2+y^2$. Observe that we now use the method \texttt{SweepUntilConvergence}, which allows us to monitor the convergence and avoid unnecessary sweeps. After each sweep, the method computes the maximum change between the new grid and the one that had resulted from the previous sweep. If this change is below some threshold \texttt{epsilon}, the method stops. 
+\noindent In this code above, our aim is to solve the Eikonal equation in the same domain, except that $F(x,y)=1+x^2+y^2$. Observe that we now use the method \texttt{SweepUntilConvergence}, which allows us to monitor the convergence after each sweep, and thus avoid unnecessary ones. After each sweep, the method computes the maximum change ($\|\cdot\|_\infty$) between the new grid and the one that had resulted from the previous sweep. If this change is below some threshold \texttt{epsilon}, the method stops. 
 
 \section{Results}
 \subsection{Distance functions in 2D}
@@ -346,7 +345,7 @@ As argued above in part \ref{}, the Eikonal equation can be used to compute the 
 \begin{equation}
 \label{cone_bvp}
     \begin{cases}
-        \|\nabla u(\textbf{x})\|_2=1 , \quad\textbf{x} \in[-1,1]^2\\
+        \|\nabla u(\vec{x})\|_2=1 , \quad\vec{x} \in[-1,1]^2\\
         u(0,0)=0
     \end{cases}
 \end{equation}
@@ -369,14 +368,15 @@ For solving numerically (\ref{cone_bvp}), we discretize the square $[-1,1]^2$ un
         \label{fig:3d-surface}
     \end{minipage}
 \end{figure}
-\vspace{20pt}
 
-\noindent Figure (\ref{fig:contour-distance}) shows the contour plots of the numerical solution. Note that since the analytical solution is $u(x,y)=\sqrt{x^2+y^2}$, we would expect in theory to have perfectly round circles. However, this remains an numerical approximation, explaining why we are seeing "oval" forms rather than perfect circles. If one were to decrease the step size $h$ (i.e. increase $N$), these ovals would eventually ressemble more and more to round circles.
-Figure (\ref{fig:3d-surface}) confirms as well that the numerical solution is somewhat close the cone we would expect \\
+\FloatBarrier
+
+\noindent Figure (\ref{fig:contour-distance}) shows the contour plots of the numerical solution. Note that since the analytical solution is $u(x,y)=\sqrt{x^2+y^2}$, we would expect in theory to have perfectly round circles. However, this remains an numerical approximation, explaining why we are seeing "oval" forms rather than perfect circles. If one were to decrease the step size $h$ (i.e. increase $N$), these ovals would eventually look more and more like perfectly round circles.
+Figure (\ref{fig:3d-surface}) confirms as well that the numerical solution is somewhat close the cone we would expect. \\
 
 \subsubsection{Convergence}
-Finally, we can analyze the convergence of the fast sweeping method for the BVP (\ref{cone_bvp}). The plot below was obtained was solving numerically the BVP, using $N\in\{201, 221,241,\dots,701\}$, converting to step sizes $h=\frac{N-1}{b-a}$. For every of these values, the numerical solutions is compared to the analytic solution. Specifically, the error is computed with the $L_\infty$ norm over the square $[-1,1]^2$. \\
-On figure (\ref{fig:error_distance}) below, we see that the accuracy of the fast sweeping method is indeed of order $O(|h\log h|)$.
+Finally, we can analyze the convergence of the fast sweeping method for the BVP (\ref{cone_bvp}). The plot below was obtained was solving numerically the BVP, using $N\in\{201, 221,241,\dots,701\}$, converting to step sizes $h=\frac{N-1}{b-a}$. For every of these values, the numerical solutions is compared to the analytic solution. Specifically, the error is computed with the $\|\cdot\|_\infty$ norm over the square $[-1,1]^2$. \\
+On figure (\ref{fig:error_distance}) below, we see that the accuracy of the fast sweeping method indeed seems to be of order $O(|h\log h|)$ in this case.
 
 
 \begin{figure}[h]
@@ -386,9 +386,9 @@ On figure (\ref{fig:error_distance}) below, we see that the accuracy of the fast
   \label{fig:error_distance}
 \end{figure}
 
-\subsection{Distance functions with several boundary points in 2D}
-The example in the previous subsection was only considering one boundary value at the origin of the domain, i.e. the set $\Gamma$ was simply $\Gamma=\{(0,0)\}$. We can introduce several other boundary points, and the solution $u$ picked up by the fast sweeping-method will give at any point $(x,y)$ the distance to the closest point $\gamma\in\Gamma$, as we showed in section \ref{section_on_distance}. Indeed consider the case below, where we chose 5 points at random on $[-1,1]^2$, and set these points to be 0 in the domain. Our Eikonal solver then converges to the numerical solution $u(x,y)$ whose contours and 3D surface are given by figures (\ref{fig:contour5}) and (\ref{fig:surface5}) respectively. \\
-It is easy to see on both the contour plots and on the 3D surface that the solution is non-differentiable on some lines inside the domain. In particular, the points on these lines are the ones lying at the same distance to at least 2 boundary points in $\Gamma$. In other words, the problem \ref{min-problem} does not have a unique minimizer for these sets of points.
+\subsection{Distance functions in 2D with several boundary points}
+The example in the previous subsection was only considering one boundary value at the origin of the domain, i.e. the set $\Gamma$ was simply $\Gamma=\{(0,0)\}$. We can introduce several other boundary points, and the solution $u$ picked up by the fast sweeping-method will give at any point $(x,y)$ the distance to the closest point $\gamma\in\Gamma$, as we showed in section (\ref{section_on_distance}). Indeed consider the case below, where we chose 5 points at random on $[-1,1]^2$, and set these points to be 0 in the domain. Our Eikonal solver then converges to the numerical solution $u(x,y)$ whose contours and 3D surface are given by figures (\ref{fig:contour5}) and (\ref{fig:surface5}) respectively. \\
+It is easy to see on both the contour plots and on the 3D surface that the solution is non-differentiable on some lines inside the domain. In particular, the points on these lines are the ones lying at the same distance to at least 2 boundary points in $\Gamma$. In other words, the problem (\ref{min-problem}) does not have a unique minimizer for these sets of points.
 
 \vspace{5pt}
 
@@ -423,18 +423,18 @@ It is easy to see on both the contour plots and on the 3D surface that the solut
 \newpage
 
 \subsection{General Eikonal equations}
-In this subsection, we now are interested at problems of the form of (\ref{original-eikonal}) where $f(x,y)\not\equiv 1$ on the domain. Conveniently, we will also rewrite $f(x,y)=\frac{1}{F(x,y)}$, where $F(x,y)$ can now be thought of as a velocity over the domain, as argued in the introduction. As a result, the solution $u(x,y)$ does not give the distance to the boundary anymore, but rather the "cost" of the travel from $(x,y)$ to $\Gamma$.
+In this subsection, we now are interested at problems of the form of (\ref{original-eikonal}) where $f(x,y)\not\equiv 1$ on the domain. Conveniently, we will also rewrite $f(x,y)=\frac{1}{F(x,y)}$, where $F(x,y)$ can now be thought of as a velocity over the domain, as argued in the derivation in the wave (or front) propagation context. As a result, the solution $u(x,y)$ does not give the distance to the boundary anymore, but rather the "cost" of the travel from $(x,y)$ to $\Gamma$.
 We test our solver for the problem.
 
 \begin{equation}
 \label{arctan_equation}
     \begin{cases}
-        \|\nabla u(x,y)\|_2=\frac{1}{1+0.5(x^2+y^2)} , \quad(x,y) \in [-2,2]^2 \\
+        |\nabla u(x,y)|=\frac{1}{1+0.5(x^2+y^2)} , \quad(x,y) \in [-2,2]^2 \\
         u(0,0)= 0
     \end{cases}
 \end{equation} \\
 
-One can easily check that $u(x,y)=\sqrt{2}\arctan\Big[\sqrt{\frac{x^2+y^2}{2}}\Big]$ solves (\ref{arctan_equation}). We use this reference to test our solver with the following parameters : $N=801$ on the discretized domain $[-2,2]^2$ which gives the step size $h=0.01$, with convergence criterion $\epsilon=10^{-6}$. The contours and surface of the numerical solution are displayed below on figures (\ref{fig:contour_arctan}) and (\ref{fig:surface_arctan}). \\
+\noindent One can check that $u(x,y)=\sqrt{2}\arctan\Big[\sqrt{\frac{x^2+y^2}{2}}\Big]$ solves (\ref{arctan_equation}). We use this reference to test our solver with the following parameters : $N=801$ on the discretized domain $[-2,2]^2$ which gives the step size $h=0.005$, with convergence criterion $\epsilon=10^{-6}$. The contours and surface of the numerical solution are displayed below on figures (\ref{fig:contour_arctan}) and (\ref{fig:surface_arctan}). \\
 
 \begin{figure}[h]
   \centering
@@ -454,8 +454,10 @@ One can easily check that $u(x,y)=\sqrt{2}\arctan\Big[\sqrt{\frac{x^2+y^2}{2}}\B
 \end{figure}
 
 \subsubsection{Convergence}
-From Zhao, we know that for the general case $1/F(x,y)\not\equiv1$, the fast-sweeping method also converges to the true solution in $\mathcal{O}(\sqrt{h})$. For the reference problem defined in the section above, with $N\in\{21,41,\dots,401\}$, we get the following convergence to the true solution. Note that the domain is smaller than for the 
-
+From Zhao, we know that for the general case $1/F(x,y)\not\equiv1$, we believe that fast-sweeping method also converges to the true solution in $\mathcal{O}(h\log h)$ in this specific case. For the reference problem defined in the section above, with $N\in\{751,1001,\dots,3751\}\implies h\in\{0.0013,0.001,\dots,0.00027\}$, we get the following convergence to the true solution. To reduce the computational cost and increase the accuracy, we reduced the domain to $\Omega=[-0.5,0.5]^2$. This convergence plot took about 40 minutes to be obtained. \\
+An important point is that we were at first not entirely sure that the order of accuracy would be $h\log h$ for this specific case. In particular, we were hesitating between $\sqrt{h}$ and $h\log h$. This led us to choosing quite small values for $h$ in order to increase our chance of seeing the asymptotic results to kick in. \\
+We fitted two linear models : $\beta_0+\beta_1\sqrt{h}$ and $\beta_0+\beta_1h\log h$ and the $R^2$ scores for the models were respectively 0.9951 and 0.9999 reinforcing our belief that the accuracy should be of order $h\log h$
+.
 \begin{figure}[h]
   \centering
   \includegraphics[width=0.6\textwidth]{plots/convergence2d_atan_step_size.png}
@@ -470,6 +472,7 @@ From Zhao, we know that for the general case $1/F(x,y)\not\equiv1$, the fast-swe
 \newpage
 
 \section{An application : Path planning}
+\label{path_planning}
 In this section, we make use of the fast-sweeping method discussed to bridge our solutions with an application : path planning. Our goal is to compute an optimal path over a domain $\Omega\subset\R^2$, starting at a point $X_0\in \R^2$ to a target set $\Gamma$. \\
 In particular, one can show in optimal control theory that given the Eikonal equation set-up that we described above where $F(x,y)$ is the positive function defining the "velocity" inside, say a medium, then the shortest path in time $\textbf{X}(t)\subset \R^2$ that goes from $X_0$ to $\Gamma$ must satisfy the following diffential equation:
 \begin{equation}
@@ -575,6 +578,7 @@ As discussed above, we approach the differential equation \ref{optimal_path_DE_2
 \noindent which we recognize as being a gradient descent, stopping when $[x_1^n,x_2^n]^T\in \Gamma$, and where $\Tilde{u_x}$ and $\Tilde{u_y}$ are the interpolated first derivatives of the numerical solution $u$.
 
 \subsection{Example : light refraction with Snell's law}
+\label{section_snells_law}
 This example covers the refraction of light when it crosses 2 media with different refraction indices. Indeed, some of the first appearances of the Eikonal equations appeared in this type of problems. Consider the following problem : we look at rays of lights in a square domain, where the lower half of the domain's refraction index is 2, and the index is 1 in the upper half plane. Consider that light is emitted at the point $X_0$ and we want to know what is the path that the rays emitted at $X_0$ will take to get to $\Gamma$. By Fermat's principle, this path is unique and is the shortest in time. However, the change of medium will make the rays of light "change" direction at the interface. \\
 
 \begin{center}
@@ -692,12 +696,34 @@ In this final section, we use our path planning technique developped in the sect
     \centering
     \includegraphics[width=\textwidth]{plots/surface_mountain_fast_lane.png}
     \caption{The 3D surface of the solution}
-    \label{3d_surface_mountain}
+    \label{3d_surface_mountain_fast_lane}
   \end{minipage}
 \end{figure}
 \FloatBarrier
 
-\noindent It is interesting to see that the path indeed avoids these regions with low velocities, which can be visualized more easily on figure (\ref{3d_surface_mountain}).
+\noindent It is particularly interesting to see that the path indeed avoids these regions with low velocities, which can be visualized more easily on figure (\ref{3d_surface_mountain}). We introduced a "fast lane" in the second example, where we set $F(x,y)=6$, and this completely modifies the trajectory of the optimal path in time.
+
+\begin{thebibliography}{9}
+
+\bibitem{zhao2005}
+H. Zhao, 
+\textit{A fast sweeping method for Eikonal equations},
+Mathematics of Computation, 74(250):603–627, 2005.
+
+\bibitem{wiki-eikonal}
+Wikipedia contributors, 
+\textit{Eikonal equation}, 
+Wikipedia, The Free Encyclopedia, 
+\href{https://en.wikipedia.org/wiki/Eikonal_equation}{https://en.wikipedia.org/wiki/Eikonal\_equation}.
+
+\bibitem{numpy}
+Harris, Charles R., et al. 
+\textit{Array programming with NumPy}. 
+Nature 585, 357–362 (2020).
+
+
+\end{thebibliography}
+
 \end{document}
 
 
