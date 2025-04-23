@@ -30,19 +30,18 @@ true_path = np.vstack([segment1, segment2])
 #LOADING THE GRID & REPLICATING THE VARIABLES IN exampleSnell.py
 dom = ComputationalDomain(N = 801, a = -1, b = 1, c = -1, d = 1)
 dom.Gamma([(200,600)])
-grid = np.load('../snell_grid.npy')
-
+grid = np.load('snell_grid.npy')
+print('h : ',dom.h)
 # COMPUTING THE PATH
 path = ODE_backtracer(x0 = [x0,y0], dt = dom.h, domain = dom, u_grid = grid)
 
 
-l = [i for i in range(10,0,-1)]
-for j in range(2,11):
-    l.append(float(1/j))
+dt = np.linspace(3 * dom.h, 1.75*dom.h, 25)
 h_distances = []
-for k in l:
-    print('k = {}'.format(k))
-    path = ODE_backtracer(x0 = [x0,y0], dt = dom.h*k, domain = dom, u_grid = grid)
+
+for dt_value in dt:
+    print('path planning with dt=',dt_value)
+    path = ODE_backtracer(x0 = [x0,y0], dt = dt_value, domain = dom, u_grid = grid)
     d1 = directed_hausdorff(path, true_path)[0]
     d2 = directed_hausdorff(true_path, path)[0]
     hausdorff_distance = max(d1, d2)
@@ -50,22 +49,9 @@ for k in l:
     print(hausdorff_distance)
 
 
-# Convert `l` to an array of step sizes
-dt_values = np.array([dom.h * k for k in l])
 h_distances = np.array(h_distances)
+np.save('dt_values.npy',np.array(dt))
+np.save('haussdorf_distances.npy',h_distances)
 
-# Sort by increasing dt (for clean plotting)
-sorted_indices = np.argsort(dt_values)
-dt_values = dt_values[sorted_indices]
-h_distances = h_distances[sorted_indices]
 
-# Plot
-plt.figure(figsize=(8, 6))
-plt.scatter(dt_values, h_distances, lw=2, label='Hausdorff distance')
-plt.xlabel("Step size (dt)")
-plt.ylabel("Hausdorff distance")
-plt.title("Convergence of Backtraced Path vs True Path")
-plt.grid(True, which="both", ls="--")
-plt.legend()
-plt.tight_layout()
 plt.show()

@@ -14,9 +14,16 @@ class EikonalSolver:
         self.grids_after_sweeps = []
         self.grids_after_sweeps.append(self.domain.grid)
         self.F = F #Velocity on the domain
+        self.F_grid = np.zeros((self.domain.N, self.domain.N))
+        for i in range(self.domain.N):
+            for j in range(self.domain.N):
+                x = self.domain.a + j * self.domain.h
+                y = self.domain.d - i * self.domain.h  # careful: numpy y axis is reversed
+                self.F_grid[i, j] = F(x, y)
 
     def update_point_with_F(self, current_grid, new_grid, i, j):
-        f_ij = 1/self.F(self.domain.a + j*self.domain.h, self.domain.d - i*self.domain.h) #converting from numpy coordinates to cartesian
+        #f_ij = 1/self.F(self.domain.a + j*self.domain.h, self.domain.d - i*self.domain.h) #converting from numpy coordinates to cartesian
+        f_ij = 1/self.F_grid[i, j]
         N = self.domain.N
         u_old = current_grid[i, j]
 

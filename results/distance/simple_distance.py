@@ -18,10 +18,10 @@ print("PDE solved on unit square grid \n")
 # CONVERGENCE ANALYSIS:
 errors = []
 epsilon = 1e-4
-A = 36 # Max value for N is 20*A + 1 = 461 here
+A = 16 # Max value for N is 20*A + 1 = 461 here
 print("Now running convergence analysis...")
 
-for N in [(20*i + 1) for i in range(10, A)]:
+for N in [(500*i + 1) for i in range(2, A)]:
     print("Running convergence analysis. N = ", N)
     unit_square = ComputationalDomain(N = N, a = -1, b = 1, c = -1, d = 1)
     unit_square.Gamma([(int((N-1)/2), int((N-1)/2))])
@@ -43,4 +43,4 @@ for N in [(20*i + 1) for i in range(10, A)]:
 
 print("Convergence analysis finished. Saving results.")
 np.save('2D_distance_errors.npy', errors)
-np.save('N_index_errors.npy', [(20*i + 1) for i in range(10,A)])
+np.save('N_index_errors.npy', [(500*i + 1) for i in range(2,A)])

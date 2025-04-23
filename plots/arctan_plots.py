@@ -4,8 +4,8 @@ import scienceplots
 from sklearn.linear_model import LinearRegression #for fitting error
 
 errors_atan = np.load('../results/general_f/2D_arctan_errors.npy')
-index = np.load('../results/general_f/N_index_errors_arctan.npy')
-
+#index = np.load('../results/general_f/N_index_errors_arctan.npy')
+index = np.array([(250*i + 1) for i in range(3,16)])
 # Convergence plot for error vs. grid size N
 plt.style.use(['science', 'grid'])
 plt.figure(figsize=(7.8, 4.8))
@@ -29,8 +29,8 @@ X = np.array([(2/(N-1)) for N in index]).reshape(-1,1)
 model.fit(np.sqrt(X), errors_atan)
 model2.fit(np.abs(X*np.log(X)),errors_atan)
 model3.fit(X**2,errors_atan)
-A = float(model.coef_)
-B = float(model.intercept_)
+A = float(model2.coef_)
+B = float(model2.intercept_)
 print('R^2 for sqrt h : ',model.score(np.sqrt(X), errors_atan))
 print('R^2 for hlogh : ',model2.score(np.abs(X*np.log(X)), errors_atan))
 print('R^2 for h^2 : ',model3.score(np.abs(X**2), errors_atan))
