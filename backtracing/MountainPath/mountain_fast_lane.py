@@ -52,7 +52,7 @@ plt.plot(path[:,0], path[:,1], color='black', linewidth=1, label='Path')
 plt.scatter(*target, color='red', s=30, label=r'$\Gamma$')
 plt.scatter(*x0, color='blue', s = 30, label=r'$x_0$')
 plt.legend()
-plt.title(r"Optimal path backtraced solving $\partial_t X = -\nabla u(X)$, with a fast lane", fontsize=16, pad = 10)
+plt.title(r"Optimal path backtraced solving $\partial_t X = -\nabla u(X)$", fontsize=16, pad = 10)
 plt.xlabel("x")
 plt.ylabel("y")# Optional: if your grid maps top-to-bottom
 plt.tight_layout()
