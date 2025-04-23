@@ -497,56 +497,63 @@ Secondly, we will discretize \ref{optimal_path_DE_2D} forward in time using time
 \subsection{Bilinear interpolation}
 Since our numerical solutions $u$ to Eikonal equations are available over a finite grid after using the Fast-Sweeping method, we need to be able to interpolate the values of the gradient of $u$ for points that do not lie in the grid, i.e. points that lie inside the cells of the grid. For this, we use bilinear interpolation. A visual explanation is displayed below.
 
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.5\textwidth]{bilinear_interpolation.jpg}
+  \caption{Visual explanation of bilinear interpolation}
+  \label{fig:your_label}
+\end{figure}
+
 Given that we know the values of the cell $u_{00},u_{01}$
 
-\begin{tikzpicture}
-  \begin{axis}[
-    title={3D Plot of Bilinear Interpolation},
-    xlabel={$x$},
-    ylabel={$y$},
-    zlabel={$z$},
-    grid=major,
-    view={50}{25},
-  ]
-    % Define corner points
-    \addplot3[
-      color=blue,
-      mark=*]
-      coordinates {
-        (0, 0, 0.3) (1, 0, 0.7) (1, 1, 1) (0, 1, 0.5)
-      };
+\begin{figure}[h]
+  \centering
+  \begin{tikzpicture}
+    \begin{axis}[
+      title={Bilinear interpolation in a mesh cell},
+      xlabel={$x$}, ylabel={$y$}, zlabel={$u$},
+      grid=major, view={50}{25}
+    ]
+      % --- corner values -----------------------------------------------------
+      \addplot3[color=blue,mark=*] coordinates
+        {(0,0,0.3) (1,0,0.7) (1,1,1) (0,1,0.5)};
 
-    % Add connecting lines
-    \addplot3[
-      color=red,
-      mark=none,
-      line width=0.5pt]
-      coordinates {
-        (0,0,0.3) (1,0,0.7)
-      };
-    \addplot3[
-      color=red,
-      mark=none,
-      line width=0.5pt]
-      coordinates {
-        (1,0,0.7) (1,1,1)
-      };
-    \addplot3[
-      color=red,
-      mark=none,
-      line width=0.5pt]
-      coordinates {
-        (1,1,1) (0,1,0.5)
-      };
-    \addplot3[
-      color=red,
-      mark=none,
-      line width=0.5pt]
-      coordinates {
-        (0,1,0.5) (0,0,0.3)
-      };
-  \end{axis}
-\end{tikzpicture}
+      % --- cell edges --------------------------------------------------------
+      \addplot3[color=red,line width=0.5pt] coordinates {(0,0,0.3) (1,0,0.7)};
+      \addplot3[color=red,line width=0.5pt] coordinates {(1,0,0.7) (1,1,1)};
+      \addplot3[color=red,line width=0.5pt] coordinates {(1,1,1) (0,1,0.5)};
+      \addplot3[color=red,line width=0.5pt] coordinates {(0,1,0.5) (0,0,0.3)};
+
+      % --- centre point in (x,y)-plane --------------------------------------
+      \addplot3[color=black,mark=*] coordinates {(0.5,0.5,0)};
+
+      % dotted vertical to interpolated height
+      \addplot3[color=black,dotted] coordinates
+        {(0.5,0.5,0) (0.5,0.5,0.625)};
+
+      % interpolated value on the surface
+      \addplot3[color=black,mark=*,mark options={fill=white}] coordinates
+        {(0.5,0.5,0.625)};
+
+      % ----------------------------------------------------------------------
+      % NEW: dotted line on the bilinear surface, x = 0.5 (up–down direction)
+      % Plane equation through the two side edges:
+      %   z(x,y) = 0.3 + 0.4 x + 0.25 y
+      % At x = 0.5 → z = 0.3 + 0.4(0.5) + 0.25 y = 0.5 + 0.25 y
+      \addplot3[color=black,dotted] coordinates
+        {(0.5,0,0.5) (0.5,1,0.75)};
+      % ----------------------------------------------------------------------
+    \end{axis}
+  \end{tikzpicture}
+  \caption{Bilinear interpolation inside one grid cell:
+           corner data (blue), cell edges (red), centre point,
+           vertical projection, interpolated value (white-filled mark),
+           and the dotted surface line in \(y\)-direction.}
+  \label{fig:bilinear_cell}
+\end{figure}
+
+
+
 
 
 
@@ -629,6 +636,8 @@ This example covers the refraction of light when it crosses 2 media with differe
 \end{equation*}
 where $d(x,y)$ be a metric on $\R^2$. In our case, we only consider the euclidean metric. Indeed, $d_H(S_1,S_2)=0\iff S_1=S_2$, and $S_n\xrightarrow{n\to\infty}S\iff\lim_{n\to\infty}d_H(S_n,S)=0$.
 Therefore, after obtaining our true path using Snell's law, we solve the ODE problem with several values of $\Delta t$, and compute $d_H(S_{\Delta_t},S)$ where $S_{\Delta_t}$ denotes the numerical path computed, and $S$ denotes the true path computed with Snell's law. We expect $d_H(S_{\Delta_t},S)\xrightarrow{\Delta_t\to0}0$, and that is what we obtain indeed:
+
+
 
 \end{document}
 
