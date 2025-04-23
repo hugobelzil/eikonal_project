@@ -495,8 +495,9 @@ In particular, one can show in optimal control theory that given the Eikonal equ
 Secondly, we will discretize \ref{optimal_path_DE_2D} forward in time using time-increments $\Delta t$ 
 
 \subsection{Bilinear interpolation}
-Since our numerical solutions $u$ to Eikonal equations are available over a finite grid after using the Fast-Sweeping method, we need to be able to interpolate the values of the gradient of $u$ for points that do not lie in the grid, i.e. points that lie inside the cells of the grid. For this, we use bilinear interpolation.
+Since our numerical solutions $u$ to Eikonal equations are available over a finite grid after using the Fast-Sweeping method, we need to be able to interpolate the values of the gradient of $u$ for points that do not lie in the grid, i.e. points that lie inside the cells of the grid. For this, we use bilinear interpolation. A visual explanation is displayed below.
 
+Given that we know the values of the cell $u_{00},u_{01}$
 
 \begin{tikzpicture}
   \begin{axis}[
@@ -626,8 +627,9 @@ This example covers the refraction of light when it crosses 2 media with differe
 \begin{equation*}
     d_H(S_1,S_2)=\max\{\sup_{s_1\in S_1}d(s_1,S_2),\sup_{s_2\in S_2}d(S_1,s_2)\}
 \end{equation*}
-where $d(x,y)$ be a metric on $\R^2$. In our case, we only consider the euclidean meatric. Indeed, $d_H(S_1,S_2)=0\iff S_1=S_2$, and $S_n\xrightarrow{n\to\infty}S\iff\lim_{n\to\infty}d_H(S_n,S)=0$.
-Therefore, after obtaining our true path using Snell's law, we solve the ODE problem with several values of $\Delta t$, and compute $d_H(S_{\Delta_t},S)$ where $S_{\Delta_t}$ denotes the numerical path computed, and $S$ denotes the true path computed with Snell's law. We expect $d_H(S_{\Delta_t},S)\xrightarrow{\Delta_t\to0}0$
+where $d(x,y)$ be a metric on $\R^2$. In our case, we only consider the euclidean metric. Indeed, $d_H(S_1,S_2)=0\iff S_1=S_2$, and $S_n\xrightarrow{n\to\infty}S\iff\lim_{n\to\infty}d_H(S_n,S)=0$.
+Therefore, after obtaining our true path using Snell's law, we solve the ODE problem with several values of $\Delta t$, and compute $d_H(S_{\Delta_t},S)$ where $S_{\Delta_t}$ denotes the numerical path computed, and $S$ denotes the true path computed with Snell's law. We expect $d_H(S_{\Delta_t},S)\xrightarrow{\Delta_t\to0}0$, and that is what we obtain indeed:
+
 \end{document}
 
 
