@@ -666,17 +666,36 @@ In this final section, we use our path planning technique developped in the sect
   \centering
   \begin{minipage}{0.45\textwidth}
     \centering
-    \includegraphics[width=\textwidth]{pl}
-    \caption{Plot 1}
+    \includegraphics[width=\textwidth]{plots/path_mountain.png}
+    \caption{Path backtraced on the domain, the heatmap represent the values of $F(x,y)$}
   \end{minipage}
   \hfill
   \begin{minipage}{0.45\textwidth}
     \centering
-    \includegraphics[width=\textwidth]{plot2.png}
-    \caption{Plot 2}
+    \includegraphics[width=\textwidth]{plots/surface_mountain.png}
+    \caption{The 3D surface of the solution}
   \end{minipage}
 \end{figure}
 
+\FloatBarrier
+
+\begin{figure}[h]
+  \centering
+  \begin{minipage}{0.45\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{plots/path_mountain_fast_lane.png}
+    \caption{Path backtraced on the domain, the heatmap represent the values of $F(x,y)$}
+  \end{minipage}
+  \hfill
+  \begin{minipage}{0.45\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{plots/surface_mountain_fast_lane.png}
+    \caption{The 3D surface of the solution}
+    \label{3d_surface_mountain}
+  \end{minipage}
+\end{figure}
+
+\noindent It is interesting to see that the path indeed avoids these regions with low velocities, which can be visualized more easily on figure (\ref{3d_surface_mountain}).
 \end{document}
 
 
