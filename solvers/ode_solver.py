@@ -12,7 +12,7 @@ def ODE_backtracer(x0, dt, domain, u_grid, max_steps=100000, tol=1e-8):
 
         if norm_grad < tol:
             break
-        # Euler step along -∇u direction (normalized)
+        # Euler step along -grad u
         x -= dt*grad[0]
         y -= dt*grad[1]
 

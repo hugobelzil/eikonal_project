@@ -1,24 +1,20 @@
 import numpy as np
-import matplotlib.pyplot as plt
-from computational_domain import ComputationalDomain
 
-
-def ReLU(x):
-    """Helper to update points in the scheme"""
-    return max(0.0, x)
-
+### MAIN CLASS IMPLEMENTING THE SOLVER FOR EIKONAL EQUATIONS WITH F=1 (DISTANCE FUNCTIONS)
 class EikonalSolver:
     def __init__(self,domain):
+        """Constructor : takes as a input a computational_domain object"""
         self.domain = domain
         self.grids_after_sweeps = []
         self.grids_after_sweeps.append(self.domain.grid)
 
     def update_point(self, current_grid, new_grid, i, j):
+        """Helper function used in the sweeps to update the Gauss-Seidel iterations"""
         N = self.domain.N
         u_old = current_grid[i, j]
 
-        if u_old == 0: #FOR DISTANCE ONLY : WE HAVE HARDCODED THIS VALUE TO BE 0 (IN GAMMA)
-            return # no update needed for points in Gamma
+        if u_old == 0: # Minimum possible value for u is 0 with the FSM (Boundary points only)
+            return #Thus, no update needed
 
         u_xmin = min([new_grid[i, j - 1] if j > 0 else np.inf,
                          new_grid[i, j + 1] if j < N - 1 else np.inf])
@@ -72,7 +68,7 @@ class EikonalSolver:
         self.grids_after_sweeps.append(new_grid)
 
     def Sweep3(self):
-        """Sweep going from bottom right corner of the domain to the top-left corner"""
+        """Sweep going from top right corner of the domain to the bottom left corner"""
         N = self.domain.N
         current_grid = self.grids_after_sweeps[-1].copy()
         new_grid = self.grids_after_sweeps[-1].copy()
@@ -83,7 +79,7 @@ class EikonalSolver:
         self.grids_after_sweeps.append(new_grid)
 
     def Sweep4(self):
-        """Sweep going from bottom right corner of the domain to the top-left corner"""
+        """Sweep going from top left corner of the domain to the bottom right corner"""
         N = self.domain.N
         current_grid = self.grids_after_sweeps[-1].copy()
         new_grid = self.grids_after_sweeps[-1].copy()
@@ -93,7 +89,7 @@ class EikonalSolver:
         self.grids_after_sweeps.append(new_grid)
 
     def BatchSweeps(self, k=1):
-        """Runs an entire sweep of batches in the domain, i.e. in all possible directions"""
+        """Runs an entire sweep of batches in the domain, i.e. in all possible directions (4)"""
         for i in range(k):
             self.Sweep1()
             self.Sweep2()
@@ -102,7 +98,7 @@ class EikonalSolver:
 
     def SweepUntilConvergence(self, epsilon = 1e-3, verbose = False):
         """Runs sweeps one by one, checking for convergence within an epsilon
-        threshold at each step, using the L-infinity norm"""
+        threshold at each step, using the L-infinity norm over the entire domain"""
         k = 0
         while True:
             prev = self.grids_after_sweeps[-1].copy()
