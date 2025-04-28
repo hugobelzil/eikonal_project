@@ -1,6 +1,6 @@
 import numpy as np
 from solvers.eikonal_distance_2D import EikonalSolver
-from computational_domain import ComputationalDomain
+from solvers.computational_domain import ComputationalDomain
 import matplotlib.pyplot as plt
 from sklearn.linear_model import LinearRegression
 

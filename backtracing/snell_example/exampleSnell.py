@@ -1,10 +1,9 @@
 import numpy as np
 from solvers.eikonal_general_F_2D import EikonalSolver
 from solvers.ode_solver import ODE_backtracer
-from computational_domain import ComputationalDomain
+from solvers.computational_domain import ComputationalDomain
 import matplotlib.pyplot as plt
-import scienceplots
-import cProfile
+
 
 ## BUILDING THE VELOCITY FUNCTION
 def F(x,y):

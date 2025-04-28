@@ -1,6 +1,5 @@
 import numpy as np
 
-
 ### CLASS DEFINING THE SOLVER FOR GENERAL EIKONAL EQUATIONS
 class EikonalSolver:
     def __init__(self, domain, F):

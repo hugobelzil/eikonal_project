@@ -1,9 +1,9 @@
-from computational_domain import ComputationalDomain
+from solvers.computational_domain import ComputationalDomain
 from solvers.ode_solver import ODE_backtracer
 from solvers.eikonal_general_F_2D import EikonalSolver
 import numpy as np
 import matplotlib.pyplot as plt
-import scienceplots
+
 
 def F(x,y):
     if (x-0.8)**2 + (y-0.3)**2 <= 0.01:
@@ -53,9 +53,6 @@ plt.ylabel("y")# Optional: if your grid maps top-to-bottom
 plt.tight_layout()
 plt.savefig('../../plots/path_mountain.png', dpi = 600)
 plt.show()
-
-
-from mpl_toolkits.mplot3d import Axes3D  # Needed for 3D plots
 
 # Create meshgrid matching the domain resolution
 x = np.linspace(dom.a, dom.b, dom.N)

@@ -1,5 +1,5 @@
 import numpy as np
-from computational_domain import ComputationalDomain
+from solvers.computational_domain import ComputationalDomain
 from solvers.eikonal_general_F_2D import EikonalSolver
 
 def F(x,y):

@@ -1,13 +1,14 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import scienceplots
-from sklearn.linear_model import LinearRegression #for fitting error
+from sklearn.linear_model import LinearRegression #for fitting errors
 
 errors_atan = np.load('../results/general_f/2D_arctan_errors.npy')
-#index = np.load('../results/general_f/N_index_errors_arctan.npy')
-index = np.array([(250*i + 1) for i in range(3,16)])
-# Convergence plot for error vs. grid size N
-plt.style.use(['science', 'grid'])
+index = np.load('../results/general_f/N_index_errors_arctan.npy')
+
+# CONVERGENCE PLOT FOR ERROR VS GRID SIZE N
+plt.style.use(['science', 'grid']) #from scienceplots for better plots
+
 plt.figure(figsize=(7.8, 4.8))
 plt.plot(index, errors_atan,  marker='x', label=r'$L^{\infty}$ Error')
 plt.xlabel("Grid size (N)")
@@ -20,12 +21,12 @@ plt.savefig('convergence_atan_grid_size.png', dpi=600, bbox_inches='tight')
 plt.show(block=True)  # Keep the window open
 
 
-# Convergence plot for error vs. step size h
+# CONVERGENCE PLOT FOR ERROR VS STEP SIZE H
 #We fit the linear model in the error
 model = LinearRegression()
 model2 = LinearRegression()
 model3 = LinearRegression()
-X = np.array([(2/(N-1)) for N in index]).reshape(-1,1)
+X = np.array([(1/(N-1)) for N in index]).reshape(-1,1)
 model.fit(np.sqrt(X), errors_atan)
 model2.fit(np.abs(X*np.log(X)),errors_atan)
 model3.fit(X**2,errors_atan)
@@ -37,10 +38,8 @@ print('R^2 for h^2 : ',model3.score(np.abs(X**2), errors_atan))
 x = np.linspace(np.min(X), np.max(X),150)
 plt.style.use(['science', 'grid'])
 plt.figure(figsize=(7.8, 4.8))
-plt.plot([(2/(N-1)) for N in index][::-1], np.flip(errors_atan),  marker='x', label=r'$L^{\infty}$ Error')
+plt.plot([(1/(N-1)) for N in index][::-1], np.flip(errors_atan),  marker='x', label=r'$L^{\infty}$ Error')
 plt.plot(x, A*np.abs(x*np.log(x)) + B, label = fr'${round(A,4)} \cdot |h \log h| + {round(B,4)}$')
-#plt.plot(x, A*np.sqrt(x) + B, label = fr'${round(A,4)} \cdot \sqrt h + {round(B,4)}$')
-
 plt.xlabel(r'Step size $h$')
 plt.ylabel("Max Error")
 plt.yscale("log")
@@ -73,7 +72,9 @@ plt.tight_layout()
 plt.savefig('solution_3d_surface_arctan.png', dpi=600)
 plt.show(block=True)
 
+
 # CONTOURS OF THE SOLUTION
+
 plt.figure(figsize=(8, 6))
 contour = plt.contour(X, Y, Z, levels = 15, cmap = 'jet')
 plt.colorbar(contour)

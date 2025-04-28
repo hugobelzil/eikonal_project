@@ -1,7 +1,7 @@
 import numpy as np
 from scipy.optimize import minimize_scalar
 from scipy.spatial.distance import directed_hausdorff
-from computational_domain import ComputationalDomain
+from solvers.computational_domain import ComputationalDomain
 from solvers.ode_solver import ODE_backtracer
 import matplotlib.pyplot as plt
 
