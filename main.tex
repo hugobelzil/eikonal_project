@@ -60,7 +60,7 @@
 \usepackage{fancyhdr}
 \pagestyle{fancy}
 \fancyhf{}
-\lhead{\footnotesize \textsc{Fast-Sweeping, Hugo Belzil}}
+\lhead{\footnotesize \textsc{Fast-Sweeping \& Path Planning , Hugo Belzil}}
 \rhead{\footnotesize \textsc{\thepage}}
 \cfoot{\footnotesize \textit{}}
 \renewcommand{\headrulewidth}{0.4pt}
@@ -146,7 +146,9 @@ The Eikonal equations have several applications across many fields of mathematic
 \end{equation}
 where $|\cdot|$ denotes the Euclidean norm in $\R^n$, and $u,f,\phi:\R^n\xrightarrow{}\R$. \\
 
-\noindent In this report, we will focus on solving Eikonal equations in 2 space dimensions. We will introduce the discretization and fast-sweeping method proposed by H.Zhao in 2008 \cite{zhao2005}, considering several scenarios for $f(x,y)$ and $\Gamma$, and observing some numerical results. Finally, we will use these results and apply them to an optimal control problem : path planning.
+\noindent In this report, we will focus on solving Eikonal equations in 2 space dimensions. We will introduce the discretization and fast-sweeping method proposed by H.Zhao in 2008 \cite{zhao2005}, considering several scenarios for $f(x,y)$ and $\Gamma$, and observing some numerical results. Finally, we will use these results and apply them to an optimal control problem : path planning. The Python implementation of the Fast-Sweeping method and all scripts used in this report are available on GitHub at: 
+\href{https://github.com/hugobelzil/eikonal_project}{github.com/hugobelzil/eikonal\_project}.
+
 
 \section{Theory}
 %Introduce the equation and give some details
@@ -160,7 +162,7 @@ Eikonal equations are common equations, encountered in several fields of the sci
 \label{level_set_equation}
     \phi_t+F(\vec{x})|\nabla \phi| =0
 \end{equation} \\
-where $F:\vec{x}\rightarrow\R$ represents the velocity at which the point $\vec{x}$ on the curve (or surface) moves. If we restrict $F$ to be strictly positive, we force the curve to move "outwards" and extend in space. This assumption allows us the make the ansatz that $\phi$ can be expressed as : $\phi(\vec{x},t)=\psi(\vec{x})-t$. The reason for this is the following : this rewriting allows us to think of $\psi(\vec{x})$ as the arrival time of the curve (or front) to the point $\vec{x}$ in space. Indeed, recall that the curve is described as the 0-level set of $\phi(\vec{x},t)$. We can now plug-in this ansatz into (\ref{level_set_equation}) and get: \\
+where $F:\vec{x}\rightarrow\R$ represents the velocity at which the point $\vec{x}$ on the curve (or surface) moves. If we restrict $F$ to be strictly positive, we force the curve to move "outward" and extend in space. This assumption allows us the make the ansatz that $\phi$ can be expressed as : $\phi(\vec{x},t)=\psi(\vec{x})-t$. The reason for this is the following : this form allows us to think of $\psi(\vec{x})$ as the arrival time of the curve (or front) to the point $\vec{x}$ in space. Indeed, recall that the curve is described as the 0-level set of $\phi(\vec{x},t)$. We can now plug-in this ansatz into (\ref{level_set_equation}) and get: \\
 \begin{align*}
     & (\psi(\vec{x})-t)_t+F|\nabla(\psi(\vec{x})-t)|=0 \\
     &\implies-1 +F|\nabla\psi| = 0 \\
@@ -277,6 +279,7 @@ The fast-sweeping scheme in decreasing in the sweeps : $\forall{}\ i,j:u^{(k)}_{
 \end{prop}
 
 \begin{prop}[\textbf{*Number of sweeps and accuracy for general equations}]
+\label{prop_general_equations}
     In the case where the velocity field $F(x,y)$ is not constant, the number of sweeps needed required to meet convergence depends on the characteristic curves, (and thus, on $F$). \\ \\
     If $|\Gamma|=1$ and $F$ is smooth, this is a special case where we can have an accuracy of order $h\log h$, as for the distance function case above. This is observed non-rigorously later in this report. \\ \\
     If $\Gamma$ and $F$ are such that the solution $u$ develops non-differentiabilities, it appears that the scheme's accuracy becomes of order $\sqrt{h}$. \\
@@ -312,7 +315,7 @@ $$\[
 \begin{lstlisting}[language=Python, caption = Instance of an Eikonal Solver for the 2D distance function]
 from computational_domain import ComputationalDomain
 from solvers.eikonal_distance_2D import EikonalSolver
-dom = ComputationalDomain(N = 501, a = -1, b = 1, c = -1, d = -1)
+domain = ComputationalDomain(N = 501, a = -1, b = 1, c = -1, d = 1)
 domain.Gamma([(250, 250)])
 
 solver = EikonalSolver(domain = dom)
@@ -325,7 +328,7 @@ print(solver.grids_after_sweeps[-1])
 \begin{lstlisting}[language=Python, caption = Instance of an Eikonal Solver for a general velocity F]
 from computational_domain import ComputationalDomain
 from solvers.eikonal_general_F_2D import EikonalSolver
-dom = ComputationalDomain(N = 501, a = -1, b = 1, c = -1, d = -1)
+domain = ComputationalDomain(N = 501, a = -1, b = 1, c = -1, d = 1)
 domain.Gamma([(250, 250)])
 eps = 1e-6
 
@@ -341,7 +344,7 @@ print(solver.grids_after_sweeps[-1])
 
 \section{Results}
 \subsection{Distance functions in 2D}
-As argued above in part \ref{}, the Eikonal equation can be used to compute the shortest distance to a boundary $\Gamma \subset \R^n$. Therefore, we test our implementation for the BVP:
+As argued above in section \ref{section_on_distance}, the Eikonal equation can be used to compute the shortest distance to a boundary $\Gamma \subset \R^n$. Therefore, we test our implementation for the BVP:
 \begin{equation}
 \label{cone_bvp}
     \begin{cases}
@@ -371,7 +374,7 @@ For solving numerically (\ref{cone_bvp}), we discretize the square $[-1,1]^2$ un
 
 \FloatBarrier
 
-\noindent Figure (\ref{fig:contour-distance}) shows the contour plots of the numerical solution. Note that since the analytical solution is $u(x,y)=\sqrt{x^2+y^2}$, we would expect in theory to have perfectly round circles. However, this remains an numerical approximation, explaining why we are seeing "oval" forms rather than perfect circles. If one were to decrease the step size $h$ (i.e. increase $N$), these ovals would eventually look more and more like perfectly round circles.
+\noindent Figure (\ref{fig:contour-distance}) shows the contour plots of the numerical solution. Note that since the analytical solution is $u(x,y)=\sqrt{x^2+y^2}$, we would expect in theory to have perfectly round circles. However, this remains a numerical approximation, explaining why we are seeing "oval" forms rather than perfect circles. If one were to decrease the step size $h$ (i.e. increase $N$), these ovals would eventually look more and more like perfectly round circles.
 Figure (\ref{fig:3d-surface}) confirms as well that the numerical solution is somewhat close the cone we would expect. \\
 
 \subsubsection{Convergence}
@@ -471,7 +474,7 @@ We fitted two linear models : $\beta_0+\beta_1\sqrt{h}$ and $\beta_0+\beta_1h\lo
 
 \newpage
 
-\section{An application : Path planning}
+\section{An application of Eikonal equations : Path planning}
 \label{path_planning}
 In this section, we make use of the fast-sweeping method discussed to bridge our solutions with an application : path planning. Our goal is to compute an optimal path over a domain $\Omega\subset\R^2$, starting at a point $X_0\in \R^2$ to a target set $\Gamma$. \\
 In particular, one can show in optimal control theory that given the Eikonal equation set-up that we described above where $F(x,y)$ is the positive function defining the "velocity" inside, say a medium, then the shortest path in time $\textbf{X}(t)\subset \R^2$ that goes from $X_0$ to $\Gamma$ must satisfy the following diffential equation:
@@ -493,10 +496,7 @@ In particular, one can show in optimal control theory that given the Eikonal equ
     \end{bmatrix}
 \end{equation}
 
-\noindent Several points need to be taken care of. First, observe that (\ref{optimal_path_DE_2D}) a time-continuous problem, while the solution $u$ obtained with the fast-sweeping method is discretized over a mesh with stepsize $h$. Therefore, we will need to be able to interpolate $\nabla u$ inside the cells of a mesh grid. For this, we will use bilinear interpolation.
-\\
-Secondly, we will discretize \ref{optimal_path_DE_2D} forward in time using time-increments $\Delta t$ 
-
+\noindent Several points need to be taken care of. First, observe that (\ref{optimal_path_DE_2D}) is a time-continuous problem, while the solution $u$ obtained with the fast-sweeping method is discretized over a mesh with stepsize $h$. Therefore, we will need to be able to interpolate $\nabla u$ inside the cells of a mesh grid. For this, we will use bilinear interpolation. Secondly, we will have to discretize (\ref{optimal_path_DE_2D}) in order to solve the problem numerically.
 \subsection{Bilinear interpolation}
 Since our numerical solutions $u$ to Eikonal equations are available over a finite grid after using the Fast-Sweeping method, we need to be able to interpolate the values of the gradient of $u$ for points that do not lie in the grid, i.e. points that lie inside the cells of the grid. For this, we use bilinear interpolation. A visual explanation is displayed below.
 
@@ -507,63 +507,33 @@ Since our numerical solutions $u$ to Eikonal equations are available over a fini
   \label{fig:your_label}
 \end{figure}
 
-Given that we know the values of the cell $u_{00},u_{01}$
+\FloatBarrier
 
-\begin{figure}[h]
-  \centering
-  \begin{tikzpicture}
-    \begin{axis}[
-      title={Bilinear interpolation in a mesh cell},
-      xlabel={$x$}, ylabel={$y$}, zlabel={$u$},
-      grid=major, view={50}{25}
-    ]
-      % --- corner values -----------------------------------------------------
-      \addplot3[color=blue,mark=*] coordinates
-        {(0,0,0.3) (1,0,0.7) (1,1,1) (0,1,0.5)};
+\noindent Given that we know the values $u_{11},u_{12},u_{21}$ and $u_{22}$, we can interpolate $u(x,y)$ inside the cell as follows.
 
-      % --- cell edges --------------------------------------------------------
-      \addplot3[color=red,line width=0.5pt] coordinates {(0,0,0.3) (1,0,0.7)};
-      \addplot3[color=red,line width=0.5pt] coordinates {(1,0,0.7) (1,1,1)};
-      \addplot3[color=red,line width=0.5pt] coordinates {(1,1,1) (0,1,0.5)};
-      \addplot3[color=red,line width=0.5pt] coordinates {(0,1,0.5) (0,0,0.3)};
-
-      % --- centre point in (x,y)-plane --------------------------------------
-      \addplot3[color=black,mark=*] coordinates {(0.5,0.5,0)};
-
-      % dotted vertical to interpolated height
-      \addplot3[color=black,dotted] coordinates
-        {(0.5,0.5,0) (0.5,0.5,0.625)};
-
-      % interpolated value on the surface
-      \addplot3[color=black,mark=*,mark options={fill=white}] coordinates
-        {(0.5,0.5,0.625)};
-
-      % ----------------------------------------------------------------------
-      % NEW: dotted line on the bilinear surface, x = 0.5 (up–down direction)
-      % Plane equation through the two side edges:
-      %   z(x,y) = 0.3 + 0.4 x + 0.25 y
-      % At x = 0.5 → z = 0.3 + 0.4(0.5) + 0.25 y = 0.5 + 0.25 y
-      \addplot3[color=black,dotted] coordinates
-        {(0.5,0,0.5) (0.5,1,0.75)};
-      % ----------------------------------------------------------------------
-    \end{axis}
-  \end{tikzpicture}
-  \caption{Bilinear interpolation inside one grid cell:
-           corner data (blue), cell edges (red), centre point,
-           vertical projection, interpolated value (white-filled mark),
-           and the dotted surface line in \(y\)-direction.}
-  \label{fig:bilinear_cell}
-\end{figure}
-
-
-
-
-
-
+\noindent The value of $u$ at the pink point on the graph above can be seen as a convex combination of the value of $u$ on the blue line ($x=x_1$) and the value of $u$ on the red line ($x=x_2$). Hence, our first step is to obtain these 2 values. Let:
+\begin{equation*}
+    \alpha=\alpha(y)=\frac{y-y_1}{y_2-y_1}
+\end{equation*}
+\noindent The interpolated value $u_b$ of $u$ on the blue line and the interpolated value $u_r$ of $u$ on the red line are respectively given by:
+\begin{equation*}
+    u_b=\alpha u_{11}+(1-\alpha)u_{12}, \quad u_r=\alpha u_{21}+(1-\alpha)u_{22}
+\end{equation*}
+From this point, we now let 
+\begin{equation*}
+    \beta=\beta(x)=\frac{x-x_1}{x_2-x_1}
+\end{equation*}
+\noindent and we can now compute the interpolated value at $\tilde{u}(x,y)$ as a convex combination of $u_b$ and $u_r$:
+\begin{equation}
+\label{interpolation}
+    \tilde{u}(x,y)&=\beta u_b+(1-\beta)u_r \\
+    &= \beta[\alpha u_{11}+(1-\alpha)u_{12}]+(1-\beta)[\alpha u_{21}+(1-\alpha)u_{12}]
+\end{equation}
+\noindent where the parameters $\alpha$ and $\beta$ are functions of $y$ and $x$ respectively. Therefore, we can take the derivatives of (\ref{interpolation}) w.r.t. $x$ and $y$, which is how we obtain the interpolated gradient of $u$.
 
 
 \subsection{Discretization of the ODE system}
-As discussed above, we approach the differential equation \ref{optimal_path_DE_2D} using a forward-in-time Euler discretization.Let $x_i^{n}=x_i(n\Delta t), i=1,2$. The scheme is:
+As discussed above, we approach the differential equation (\ref{optimal_path_DE_2D}) using a forward-in-time Euler discretization.Let $x_i^{n}=x_i(n\Delta t), i=1,2$. The scheme is:
 \begin{equation}
     \begin{cases}
         \frac{x_1^{n+1}-x_1^n}{\Delta t}=-\Tilde{u_x}(x_1^n,x_2^n) \\
@@ -579,7 +549,7 @@ As discussed above, we approach the differential equation \ref{optimal_path_DE_2
 
 \subsection{Example : light refraction with Snell's law}
 \label{section_snells_law}
-This example covers the refraction of light when it crosses 2 media with different refraction indices. Indeed, some of the first appearances of the Eikonal equations appeared in this type of problems. Consider the following problem : we look at rays of lights in a square domain, where the lower half of the domain's refraction index is 2, and the index is 1 in the upper half plane. Consider that light is emitted at the point $X_0$ and we want to know what is the path that the rays emitted at $X_0$ will take to get to $\Gamma$. By Fermat's principle, this path is unique and is the shortest in time. However, the change of medium will make the rays of light "change" direction at the interface. \\
+This example covers the refraction of light when it crosses 2 media with different refraction indices. Indeed, some of the first appearances of the Eikonal equations appeared in this type of problems. Consider the following problem : we look at rays of lights in a square domain, where the lower half of the domain's refraction index is 2, and the index is 1 in the upper half plane. Suppose that light is emitted at the point $X_0$ and we want to know what is the path that the rays emitted at $X_0$ will take to get to $\Gamma$. By Fermat's principle, this path is unique and is the shortest in time. However, the change of medium will make the rays of light "change" direction at the interface. \\
 
 \begin{center}
 \begin{tikzpicture}[scale=4]
@@ -605,7 +575,7 @@ This example covers the refraction of light when it crosses 2 media with differe
 
   % Refracted path
   \draw[very thick, ->] (0.4,0.2) -- (0.48,0.5);
-  \draw[very thick, ->] (0.48,0.5) -- (0.8,0.9);
+  \draw[very thick, ->] (0.48,0.5) -- (0.8,0.85);
 
   % Interface label
   \node[below right] at (0.001,0.5) {Interface};
@@ -613,32 +583,34 @@ This example covers the refraction of light when it crosses 2 media with differe
 \end{tikzpicture}
 \end{center}
 
-\noindent The refractive index $n=n(x,y)$ is inversely proportional to the speed in the medium. Hence, assume that we have solved the solution to (\ref{original-eikonal}) over $[-1,1]^2$, with $F(x,y)=F_2 =2$ in the lower half of $[-1,1]^2$, and $F(x,y)=F_1 = 1$ in the upper half. We know that in each media, the path will be straight lines that will intersect at the interface domain, on the line $y=0$. Therefore, one cam compute the coordinates of the point $x$ which minimizes the time travel of light over the path from $X_0=(x_0,y_0)$ and the target $\Gamma=(x_T,y_T)$, i.e.:
+\noindent The refractive index $n=n(x,y)$ is inversely proportional to the speed in the medium. Hence, assume that we have solved the solution to (\ref{original-eikonal}) over $[-1,1]^2$, with $F(x,y)=F_2 =2$ in the lower half of $[-1,1]^2$, and $F(x,y)=F_1 = 1$ in the upper half. We know that in each medium, the path will consist of 2 straight lines that will join each other at the interface, on the line $y=0$. Therefore, one can compute the coordinates of the point $x$ which minimizes the time travel of light over the path from $X_0=(x_0,y_0)$ and the target $\Gamma=(x_T,y_T)$, i.e.:
 
 \begin{equation}
 \label{travel_time}
     \min_{x\in[-1,1]}T(x)=\underbrace{\frac{\sqrt{(x-x_0)^2+y_0^2}}{F_1}}_{\text{Time of travel in lower half}}+\underbrace{\frac{\sqrt{(x-x_T)^2+y_T^2}}{F_2}}_{\text{Time of travel in upper half}}
 \end{equation}
 
-\noindent Note that we strategically placed the interface on the line $y=0$, in order to simplify a bit this optimization problem. In our code, we chose $X_0=(x_0,y_0)=(0,-0.5)$ and $\Gamma =(0.5,0.5)$ which also simplifies the optimization problem. But we are still lazy and use \texttt{Scipy} in order to compute the solution to (\ref{travel_time}). \\
-\noindent Our next step is to solve \ref{optimal_path_DE_2D}, and compare our path to the true path which we obtained above by computing the $x$-coordinate on the interface. We use the \texttt{solvers.ODE\_backtracer} method available in the repository and obtain the path below.
+\noindent Note that we strategically placed the interface on the line $y=0$, in order to simplify a bit this optimization problem. In our implementation, we chose $X_0=(x_0,y_0)=(0,-0.5)$ and $\Gamma =(0.5,0.5)$ which also simplifies the optimization problem. But we are still lazy and use \texttt{Scipy} in order to compute the solution to (\ref{travel_time}). \\
+\noindent Our next step is to solve (\ref{optimal_path_DE_2D}), and compare our path to the true path which we obtained above by computing the $x$-coordinate of the intersection on the interface. We use the \texttt{solvers.ODE\_backtracer} method available in the repository and obtain the path below.
 
 \begin{figure}[h]
   \centering
-  \includegraphics[width=0.6\textwidth]{plots/snell_path.png}
+  \includegraphics[width=0.48\textwidth]{plots/snell_path.png}
   \caption{Backtraced path from $X_0$ to $\Gamma$ using the numerical solution to the ODE system (\ref{optimal_path_DE_2D})}
   \label{fig:snell_path}
 \end{figure}
+
+\FloatBarrier
 
 \noindent This path seems correct but we would like to confirm that our implementation does converge to the true solution. Luckily, the previous work we did to compute the $x$-coordinate on the line $y=0$ can be compared with our path. For this purpose, we introduce the Hausdorff distance: \\
 
 \vspace{5pt}
 
-\noindent\textbf{Hausdorff distance between 2 curves :} Given 2 curves $S_1,S_2\subset \mathbb{R}^n$, the Hausdorff distance is a measure that quantifies how close in curves are to each other. It if formally defined as:
+\noindent\textbf{Hausdorff distance between 2 curves :} Given 2 curves $S_1,S_2\subset \mathbb{R}^n$, the Hausdorff distance is a measure that quantifies how close the curves $S_1$ and $S_2$ are to each other in space. It is formally defined as: 
 \begin{equation*}
     d_H(S_1,S_2)=\max\{\sup_{s_1\in S_1}d(s_1,S_2),\sup_{s_2\in S_2}d(S_1,s_2)\}
 \end{equation*}
-where $d(x,y)$ be a metric on $\R^2$. In our case, we only consider the euclidean metric. Indeed, $d_H(S_1,S_2)=0\iff S_1=S_2$, and $S_n\xrightarrow{n\to\infty}S\iff\lim_{n\to\infty}d_H(S_n,S)=0$.
+where $d(x,y)$ is a metric on $\R^2$. In our case, we consider the the Hausdorff distance using the Euclidean metric $d$. It holds that $d_H(S_1,S_2)=0\iff S_1=S_2$, and $S_n\xrightarrow{n\to\infty}S\iff\lim_{n\to\infty}d_H(S_n,S)=0$.
 Therefore, after obtaining our true path using Snell's law, we solve the ODE problem with several values of $\Delta t$, and compute $d_H(S_{\Delta_t},S)$ where $S_{\Delta_t}$ denotes the numerical path computed, and $S$ denotes the true path computed with Snell's law. We expect $d_H(S_{\Delta_t},S)\xrightarrow{\Delta_t\to0}0$, and that is what we obtain indeed for $\Delta_t\in[1.75h,3h]$ \\
 
 \begin{figure}[h]
@@ -650,7 +622,7 @@ Therefore, after obtaining our true path using Snell's law, we solve the ODE pro
 
 \FloatBarrier
 
-\noindent Notice that for these range of values, we have a line with slope roughly equal to 1 for all points. This is expected since the forward-int-time Euler discretization is of order $\mathcal{O}(\Delta_t)$. However, we notice that around $\log(\Delta_t)\approx-5.25$, there seems to be a drop in the log Hausdorff distance, and the errors seems to plateau beyond this point. We verify this assumption by plotting the error over a larger range ($\Delta_t\in[h,3h]$) \\
+\noindent The green line was fitted on the 18 first points starting from the right. It had a slope roughly equal to 1, which was expected since the forward-in-time Euler discretization is of order $\mathcal{O}(\Delta_t)$. However, we notice that around $\log(\Delta_t)\approx-5.25$, there seems to be a drop in the log Hausdorff distance, and the errors seems to plateau beyond this point. We verify this assumption by plotting the error over a larger range ($\Delta_t\in[h,3h]$). \\
 
 \begin{figure}[h!]
   \centering
@@ -665,20 +637,21 @@ Therefore, after obtaining our true path using Snell's law, we solve the ODE pro
 \noindent Our claim is the following : even if our numerical ODE solver's accuracy is of order $\mathcal{O}(\Delta_t)$, this plateau probably occurs at a point, where it is now our bilinear interpolation which causes this error to plateau with respect to $\Delta_t$. In other words, after this , the error induced by lowering $\Delta_t$ is lower than the error induced by the bilinear interpolation.
 
 \subsection{Paths avoiding objects}
-In this final section, we use our path planning technique developped in the section aboves to some more interesting examples. In the examples below, we let the velocity function $F(x,y)$ take different values on the different regions of the domain, set a starting point and a target and let our ODE solver compute the optimal path.
+In this final section, we use our path planning technique developped in the sections above on some more interesting examples. In the examples below, we let the velocity function $F(x,y)$ take different values on the different regions of the domain, set a starting point and a target and let our ODE solver compute the optimal path. These could be thought of as objects in a room, and the path would be a path computed by a robot, to go from its starting point $X_0$ to $\Gamma$
 
 \begin{figure}[h]
   \centering
   \begin{minipage}{0.45\textwidth}
     \centering
     \includegraphics[width=\textwidth]{plots/path_mountain.png}
-    \caption{Path backtraced on the domain, the heatmap represent the values of $F(x,y)$}
+    \caption{Path backtraced on the domain, the heatmap represents the values of $F(x,y)$}
   \end{minipage}
   \hfill
   \begin{minipage}{0.45\textwidth}
     \centering
     \includegraphics[width=\textwidth]{plots/surface_mountain.png}
     \caption{The 3D surface of the solution}
+    \label{3d_surface_mountain}
   \end{minipage}
 \end{figure}
 
@@ -701,7 +674,16 @@ In this final section, we use our path planning technique developped in the sect
 \end{figure}
 \FloatBarrier
 
-\noindent It is particularly interesting to see that the path indeed avoids these regions with low velocities, which can be visualized more easily on figure (\ref{3d_surface_mountain}). We introduced a "fast lane" in the second example, where we set $F(x,y)=6$, and this completely modifies the trajectory of the optimal path in time.
+\noindent It is particularly interesting to see that the path indeed avoids these regions with low velocities, which can be visualized more easily on figure (\ref{3d_surface_mountain}). We introduced a "fast lane" in the second example, where we set $F(x,y)=6$, and this completely modifies the trajectory of the optimal path in time. Figures (\ref{3d_surface_mountain}) and (\ref{3d_surface_mountain_fast_lane}) are interesting to compare : adding the fast lane on the left side of the domain significantly lowers the value of $u$ in this region, i.e. the cost it takes to go from there to the target $\Gamma$.
+Thanks to Madelyn Schaffer for her idea of introducing a fast-lane, and allowing me to adapt it to my example!
+\section{Conclusion}
+In this report, we aimed at implementing the Fast-Sweeping method for solving Eikonal equations. This Hamilton-Jacobi scheme can easily be extended to high-dimensional problems, and is not computationally too expensive. This method possesses several interesting properties, especially regarding its order of accuracy which heavily depends on the set-up the boundary-value problem. Several points could be addressed in further investigation of the fast-sweeping method. In particular, a few ideas we would like to investigate (and potentially update this report with) are :
+\begin{itemize}
+    \item Formalizing the orders of convergence of the method, especially when the velocity field $F$ is not constant or when $|\Gamma|>1$, mentioned in (\ref{prop_general_equations}). We would also want to look at the regime change of the order of accuracy when computing the distance functions with $|\Gamma|>1$.
+    \item The accuracy of the Hausdorff distance in section (\ref{section_snells_law}) eventually reaches a plateau. We claim that higher-accuracy interpolation methods such as bicubic interpolation would help pushing this plateau to happen at lower values of $\Delta_t$, and thus help achieve better accuracies for the path computations. Similarly, we could use some other discretizations the ODE system, and obtain a better accuracy.
+    \item We would also like to go over our Python implementation in order to optimize the algorithm and potentially decrease the runtime. This has been an iterative process since the beginning of this project, but there surely are opportunities left to lower the runtime.
+    \item Finally, we would like to find some topographical data in order to apply our path planning to a real-life scenario. If we can get access to the elevation map of a specific region, we could compute the shortest path in time given these elevations. For example, the gradient of the terrain could be used to inform the velocity field $F$ (i.e. penalize the velocity when the norm of the gradient of the elevation is high).
+\end{itemize}
 
 \begin{thebibliography}{9}
 
