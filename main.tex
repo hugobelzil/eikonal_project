@@ -134,7 +134,6 @@
 \clearpage
 
 \section{Introduction}
-%this is where you will describe the problem (e.g. previous work, related work,...) you are solving and the objectives
 \label{sec:intro}
 The Eikonal equations have several applications across many fields of mathematics, engineering, and others. They are particularly used for solving optimization problems, as we will see in this project. These equations associated to some side-condition, are of the form \\
 \begin{equation}
@@ -296,9 +295,9 @@ from computational_domain import ComputationalDomain
 domain = ComputationalDomain(N = 6, a = -1, b = 1, c = -1, d = 1)
 domain.Gamma([(0,0), (2,1), (4,3), (1,4)])
 print(domain.grid)
-\end{lstlisting} \\
+\end{lstlisting} 
 
-$$\[
+\[
 \begin{bmatrix}
 0 & 100 & 100 & 100 & 100 & 100 \\
 100 & 100 & 100 & 100 & 0 & 100 \\
@@ -307,7 +306,7 @@ $$\[
 100 & 100 & 100 & 0 & 100 & 100 \\
 100 & 100 & 100 & 100 & 100 & 100
 \end{bmatrix}
-\]$$ \\
+\]
 
 
 \noindent The code in the repository comes with 2 classes, \texttt{eikonal\_distance\_2D} and \texttt{eikonal\_general\_F}, which help treating distinctly the cases where $F(x,y)\equiv1$ and $F(x,y)\not\equiv1$. Both classes come with a method named \texttt{EikonalSolver()}, both taking as input an object of the class \texttt{computational\_domain} described above. Additionally, the \texttt{EikonalSolver} method from the general function $F$ takes as input the function $F$. An example for both cases is available below. \\
@@ -321,7 +320,7 @@ domain.Gamma([(250, 250)])
 solver = EikonalSolver(domain = dom)
 solver.BatchSweeps(k = 1)
 print(solver.grids_after_sweeps[-1])
-\end{lstlisting} \\
+\end{lstlisting} 
 
 \noindent In this code above, we solve the Eikonal equation for the distance to the origin over the square $[-1,1]^2$ with $N=501$ grid points. The \texttt{solver} object stores the grid after each sweep, and line 8 allows to access the last grid (after the fourth sweep), which is stored as a Numpy array. The snippet below extends the method to the general function $F$. \\
 
@@ -407,7 +406,7 @@ It is easy to see on both the contour plots and on the 3D surface that the solut
   \begin{minipage}{0.45\textwidth}
     \centering
     \includegraphics[width=\linewidth]{plots/solution_3d_surface_random5.png}
-    \caption{3D surface of the solution ($|\Gamma$|=5)}
+    \caption{3D surface of the solution ($|\Gamma|=5$)}
     \label{fig:surface5}
   \end{minipage}
 \end{figure}
@@ -526,9 +525,13 @@ From this point, we now let
 \noindent and we can now compute the interpolated value at $\tilde{u}(x,y)$ as a convex combination of $u_b$ and $u_r$:
 \begin{equation}
 \label{interpolation}
-    \tilde{u}(x,y)&=\beta u_b+(1-\beta)u_r \\
-    &= \beta[\alpha u_{11}+(1-\alpha)u_{12}]+(1-\beta)[\alpha u_{21}+(1-\alpha)u_{12}]
+\begin{aligned}
+\tilde{u}(x,y) &= \beta u_b + (1-\beta)u_r \\[4pt]
+               &= \beta\bigl( \alpha u_{11} + (1-\alpha)u_{12} \bigr)
+                  + (1-\beta)\bigl( \alpha u_{21} + (1-\alpha)u_{22} \bigr)
+\end{aligned}
 \end{equation}
+
 \noindent where the parameters $\alpha$ and $\beta$ are functions of $y$ and $x$ respectively. Therefore, we can take the derivatives of (\ref{interpolation}) w.r.t. $x$ and $y$, which is how we obtain the interpolated gradient of $u$.
 
 
@@ -536,16 +539,16 @@ From this point, we now let
 As discussed above, we approach the differential equation (\ref{optimal_path_DE_2D}) using a forward-in-time Euler discretization.Let $x_i^{n}=x_i(n\Delta t), i=1,2$. The scheme is:
 \begin{equation}
     \begin{cases}
-        \frac{x_1^{n+1}-x_1^n}{\Delta t}=-\Tilde{u_x}(x_1^n,x_2^n) \\
-        \frac{x_2^{n+1}-x_2^n}{\Delta t}=-\Tilde{u_y}(x_1^n,x_2^n)
+        \frac{x_1^{n+1}-x_1^n}{\Delta t}=-\tilde{u_x}(x_1^n,x_2^n) \\
+        \frac{x_2^{n+1}-x_2^n}{\Delta t}=-\tilde{u_y}(x_1^n,x_2^n)
     \end{cases} \implies
     \begin{cases}
-        x_1^{n+1} = x_1^n-\Delta t\Tilde{u_x}(x_1^n,x_2^n) \\
-        x_2^{n+1} = x_2^n-\Delta t\Tilde{u_y}(x_1^n,x_2^n)
+        x_1^{n+1} = x_1^n-\Delta t\tilde{u_x}(x_1^n,x_2^n) \\
+        x_2^{n+1} = x_2^n-\Delta t\tilde{u_y}(x_1^n,x_2^n)
     \end{cases}
 \end{equation}
 
-\noindent which we recognize as being a gradient descent, stopping when $[x_1^n,x_2^n]^T\in \Gamma$, and where $\Tilde{u_x}$ and $\Tilde{u_y}$ are the interpolated first derivatives of the numerical solution $u$.
+\noindent which we recognize as being a gradient descent, stopping when $[x_1^n,x_2^n]^T\in \Gamma$, and where $\tilde{u_x}$ and $\tilde{u_y}$ are the interpolated first derivatives of the numerical solution $u$.
 
 \subsection{Example : light refraction with Snell's law}
 \label{section_snells_law}
@@ -618,7 +621,7 @@ Therefore, after obtaining our true path using Snell's law, we solve the ODE pro
   \includegraphics[width=0.7\linewidth]{plots/loglog_plot_convergence_path.png}
   \caption{Log-Log plot of the Hausdorff distance versus $\Delta t$}
   \label{fig:loglog_conv_hausdorff}
-\end{figure} \\
+\end{figure} 
 
 \FloatBarrier
 
